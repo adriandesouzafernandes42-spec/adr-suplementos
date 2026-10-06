@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<style>[hidden]{display:none!important}</style>
+<title>Ian explica a B12 | ADR Suplementos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: um palco escuro. O Ian é o protagonista: anda, cresce e diminui à esquerda do palco e estica o braço por cima do conteúdo para apontar o que está explicando. O conteúdo fica à direita. No celular, conteúdo em cima e Ian embaixo, com o balão ao lado. */
+:root{
+  --ink:#0B0A08;
+  --stage:#12100D;
+  --panel:#1A1712;
+  --line:#2E2921;
+  --gold:#C99A4E;
+  --gold-hi:#E6BE78;
+  --cream:#F3EFE6;
+  --muted:#A69C8A;
+  --f-display:'Bricolage Grotesque','Avenir Next','Segoe UI',sans-serif;
+  --f-body:'DM Sans','Helvetica Neue',Arial,sans-serif;
+  --f-mono:'DM Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+#ian [hidden]{display:none}
+html,body{background:var(--ink);color:var(--cream)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 28px;overflow-x:hidden}
+.wrap{max-width:1200px;margin:0 auto}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.brand{font-weight:700;letter-spacing:.18em;text-transform:uppercase;font-size:13px;border:1.5px solid var(--cream);padding:7px 10px 7px 12px;line-height:1}
+.count{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.stage{position:relative;height:clamp(640px,80vh,760px);background:radial-gradient(120% 90% at 20% 100%,#1E1a13 0%,var(--stage) 55%);border:1px solid var(--line);border-radius:26px;overflow:hidden;touch-action:pan-y}
+.formula-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+.formula-bg span{position:absolute;font-family:var(--f-display);font-weight:800;color:var(--gold);white-space:nowrap;line-height:1}
+.formula-bg .f1{font-size:clamp(70px,12vw,170px);top:3%;left:-1%;opacity:.055}
+.formula-bg .f2{font-size:clamp(36px,5vw,70px);bottom:3%;right:2%;opacity:.05}
+.formula-bg sub{font-size:.5em;vertical-align:-.15em}
+.floor{position:absolute;left:0;right:0;bottom:0;height:18%;background:linear-gradient(to top,rgba(201,154,78,.07),transparent);pointer-events:none}
+
+.content{position:absolute;top:0;bottom:0;right:0;width:56%;padding:40px 40px 96px 12px;z-index:1;display:flex;flex-direction:column;min-width:0}
+.slide{display:none;flex-direction:column;gap:16px;min-width:0}
+.slide.on{display:flex;animation:enter .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes enter{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+h1,h2{font-family:var(--f-display);font-weight:800;line-height:1.02;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(34px,4.4vw,58px)}
+h2{font-size:clamp(26px,3vw,38px)}
+p{margin:0;max-width:60ch}
+.lead{font-size:17px}
+.soft{color:var(--muted)}
+.formula{font-family:var(--f-display);font-weight:800;font-size:clamp(34px,5.2vw,70px);color:var(--gold);line-height:1;text-shadow:0 0 40px rgba(201,154,78,.25);align-self:flex-start;border-radius:12px;padding:4px 6px;margin-left:-6px}
+.formula sub{font-size:.48em;vertical-align:-.12em}
+.facts{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--f-mono);font-size:13px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.02)}
+.chip em{font-style:normal;color:var(--gold)}
+.picks{display:flex;flex-wrap:wrap;gap:8px}
+.pick{font:500 14px var(--f-body);color:var(--cream);background:transparent;border:1.5px solid var(--line);border-radius:999px;padding:9px 14px;min-height:42px;cursor:pointer;transition:border-color .2s,background .2s,color .2s}
+.pick:hover{border-color:var(--gold)}
+.pick[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.hint{font-size:13px;color:var(--muted)}
+
+/* destaque do que o Ian aponta */
+.pointed{box-shadow:0 0 0 2px var(--gold),0 0 28px rgba(201,154,78,.35);transition:box-shadow .3s}
+.mol .part{transition:opacity .3s}
+.mol.focus .part{opacity:.25}
+.mol.focus .part.hl{opacity:1}
+.mol{width:100%;max-width:400px;height:auto}
+.mol text{font-family:var(--f-mono)}
+
+.route{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;position:relative;margin-top:6px}
+.route::before{content:"";position:absolute;left:10%;right:10%;top:23px;height:2px;background:var(--line)}
+.stop{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;color:var(--muted);font:500 13px var(--f-body);cursor:pointer;padding:0 2px;text-align:center}
+.stop .n{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--stage);border:2px solid var(--line);font-family:var(--f-mono);font-size:15px;color:var(--cream);transition:all .25s}
+.stop[aria-pressed="true"]{color:var(--cream)}
+.stop[aria-pressed="true"] .n{background:var(--gold);border-color:var(--gold);color:var(--ink);box-shadow:0 0 0 6px rgba(201,154,78,.15)}
+.stop:focus-visible{outline:none}.stop:focus-visible .n{outline:2px solid var(--gold-hi);outline-offset:3px}
+
+.rx{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--f-display);font-weight:600;font-size:clamp(17px,2vw,22px)}
+.rx .mname{border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;background:rgba(255,255,255,.02)}
+.rx .arr{display:flex;flex-direction:column;align-items:center;font-family:var(--f-mono);font-size:12px;color:var(--gold);gap:2px;border-radius:10px;padding:4px}
+.rx .arr svg{width:100px;height:14px}
+
+.claims{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.claims li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:15px;transition:border-color .3s,background .3s}
+.claims li.lit{border-color:var(--gold);background:rgba(201,154,78,.1)}
+.claims .ico{flex:0 0 28px;height:28px;border-radius:50%;background:rgba(201,154,78,.14);display:grid;place-items:center}
+.claims .ico svg{width:15px;height:15px;stroke:var(--gold)}
+.fine{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
+.legal{border-top:1px solid var(--line);padding-top:10px;font-size:12.5px;color:var(--muted)}
+
+/* Ian */
+.ian-wrap{position:absolute;left:var(--x,24%);bottom:var(--b,3%);width:300px;transform:translateX(-50%) scale(var(--s,1));transform-origin:50% 100%;transition:left .9s cubic-bezier(.34,1.3,.5,1),bottom .9s cubic-bezier(.34,1.3,.5,1),transform .9s cubic-bezier(.34,1.35,.5,1);z-index:3;pointer-events:none}
+#ian{width:300px;height:auto;display:block;overflow:visible}
+.bubble{position:absolute;z-index:4;background:var(--cream);color:var(--ink);border-radius:20px;padding:13px 16px;font-size:15.5px;line-height:1.42;font-weight:500;width:min(330px,40%);box-shadow:0 10px 30px rgba(0,0,0,.35);transition:opacity .2s;pointer-events:none}
+.bubble b{color:#7A5617}
+.ch{opacity:0;transition:opacity .22s ease}
+.ch.in{opacity:1}
+.caret{display:inline-block;width:2px;height:1.05em;background:#7A5617;vertical-align:-.15em;margin-left:1px;animation:caret .8s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.bubble::after{content:"";position:absolute;bottom:-10px;left:var(--tail,40px);border:11px solid transparent;border-bottom:0;border-top-color:var(--cream)}
+.bubble.side::after{left:-10px;bottom:auto;top:26px;border:11px solid transparent;border-left:0;border-right-color:var(--cream)}
+.bubble .ch{opacity:0;display:inline;transition:opacity .16s ease}
+.bubble .ch.in{opacity:1}
+.bubble .caret{display:inline-block;width:2px;height:1.05em;margin:0 1px -2px;background:#8A6424;animation:caret .7s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.bubble .name{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#8A6424;margin-bottom:2px}
+
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:16px 22px}
+.nav .dots{display:flex;gap:8px;margin-right:auto;padding-left:46%}
+.dot{width:10px;height:10px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0}
+.dot[aria-current="true"]{background:var(--gold);width:26px;border-radius:6px}
+.btn{font:700 15px var(--f-body);color:var(--cream);background:rgba(18,16,13,.8);border:1.5px solid var(--cream);border-radius:999px;padding:10px 18px;min-height:44px;cursor:pointer}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.btn:disabled{opacity:.3;cursor:default}
+
+.spark{opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+.sparkle .spark{animation:spark 1s ease-out}
+.sparkle .spark:nth-child(2){animation-delay:.12s}.sparkle .spark:nth-child(3){animation-delay:.24s}
+@keyframes spark{0%{opacity:0;transform:scale(.2) rotate(0)}35%{opacity:1;transform:scale(1.15) rotate(25deg)}100%{opacity:0;transform:scale(.6) rotate(60deg)}}
+#ian.back #faceFeat,#ian.back #badge,#ian.back #badgeTxt,#ian.back #hl,#ian.back #sparks{display:none}
+.alive{position:absolute;pointer-events:none;transform-origin:50% 50%;will-change:transform}
+.content.out{opacity:0;transition:opacity .35s}
+.disco-lights{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0;transition:opacity .5s}
+.disco-lights.on{opacity:1}
+.disco-lights span{position:absolute;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(240,205,140,.38),transparent 65%);animation:spot 3.2s ease-in-out infinite alternate}
+.disco-lights span:nth-child(2){background:radial-gradient(circle,rgba(243,239,230,.16),transparent 65%);animation-duration:2.6s;animation-delay:-1s}
+.disco-lights span:nth-child(3){animation-duration:3.8s;animation-delay:-2s}
+.disco-lights span:nth-child(4){background:radial-gradient(circle,rgba(243,239,230,.14),transparent 65%);animation-duration:2.2s;animation-delay:-.5s}
+@keyframes spot{0%{left:5%;top:10%}33%{left:60%;top:55%}66%{left:25%;top:65%}100%{left:75%;top:8%}}
+.hint.tap{display:flex;align-items:center;gap:6px;color:var(--gold-hi)}
+.pick[data-part]:not(.seen),.pick[data-cell]:not(.seen){animation:nudge 1.8s ease-in-out infinite}
+.stop:not(.seen) .n{animation:nudge 1.8s ease-in-out infinite}
+@keyframes nudge{0%,100%{box-shadow:0 0 0 0 rgba(201,154,78,0)}50%{box-shadow:0 0 0 6px rgba(201,154,78,.28)}}
+.glow{opacity:0;transition:opacity .35s}
+.glow.on{opacity:1}
+
+@media (max-width:760px){
+  .stage{height:900px}
+  .content{left:0;right:0;width:auto;bottom:auto;height:58%;padding:24px 18px 8px;overflow-y:auto}
+  .nav{padding:12px 14px}
+  .nav .dots{padding-left:0}
+  .claims{grid-template-columns:1fr}
+  .stop{font-size:11px}.stop .n{width:38px;height:38px}.route::before{top:19px}
+  .bubble{font-size:14.5px}
+}
+@media (prefers-reduced-motion:reduce){.pick,.stop .n{animation:none!important}.slide.on{animation:none}.ian-wrap{transition:none}.sparkle .spark{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="brand">ADR Nutra</span>
+    <span class="count" id="count">01 / 07</span>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="formula-bg" aria-hidden="true">
+      <span class="f1">C<sub>63</sub>H<sub>91</sub>CoN<sub>13</sub>O<sub>14</sub>P</span>
+      <span class="f2">Co · CH<sub>3</sub> · 1344,4 g/mol</span>
+    </div>
+    <div class="floor"></div>
+    <div class="disco-lights" id="discoLights" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+
+    <div class="content" id="content">
+      <section class="slide on">
+        <span class="eyebrow">Vitamina B12 · Metilcobalamina</span>
+        <h1>Como a B12 funciona no seu corpo</h1>
+        <div class="formula" id="formula" aria-label="Fórmula da metilcobalamina: C63 H91 Co N13 O14 P">C<sub>63</sub>H<sub>91</sub>CoN<sub>13</sub>O<sub>14</sub>P</div>
+        <div class="facts">
+          <span class="chip">massa molar <em>1344,4 g/mol</em></span>
+          <span class="chip">metal central <em>cobalto (Co)</em></span>
+          <span class="chip">hidrossolúvel</span>
+        </div>
+        <p class="hint">7 telas curtas. Avance pelos botões, pelas setas do teclado ou deslizando o dedo.</p>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">A molécula</span>
+        <h2>Um átomo de cobalto no centro de tudo</h2>
+        <svg class="mol" id="mol" viewBox="0 0 400 320" role="img" aria-label="Esquema simplificado da metilcobalamina">
+          <defs><radialGradient id="gGoldMol" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#F1D29A"/><stop offset="0.6" stop-color="#C99A4E"/><stop offset="1" stop-color="#86632C"/></radialGradient></defs>
+          <g class="part" data-part="metil" id="p-metil">
+            <line x1="200" y1="150" x2="200" y2="72" stroke="#E6BE78" stroke-width="3"/>
+            <circle cx="200" cy="58" r="20" fill="#12100D" stroke="#E6BE78" stroke-width="2.5"/>
+            <text x="200" y="63" text-anchor="middle" font-size="14" fill="#E6BE78">CH₃</text>
+          </g>
+          <g class="part" data-part="anel" id="p-anel">
+            <path d="M 138 104 L 168 94 L 178 122 L 152 140 L 126 128 Z M 262 104 L 232 94 L 222 122 L 248 140 L 274 128 Z M 138 206 L 168 216 L 178 188 L 152 170 L 126 182 Z M 262 206 L 232 216 L 222 188 L 248 170 L 274 182 Z" fill="none" stroke="#A69C8A" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M 168 94 Q 200 80 232 94 M 274 128 Q 292 155 274 182 M 232 216 Q 200 230 168 216 M 126 128 L 126 182" fill="none" stroke="#A69C8A" stroke-width="2.5"/>
+            <g stroke="#F3EFE6" stroke-width="2" stroke-dasharray="4 4"><line x1="178" y1="128" x2="196" y2="146"/><line x1="222" y1="128" x2="204" y2="146"/><line x1="178" y1="182" x2="196" y2="164"/><line x1="222" y1="182" x2="204" y2="164"/></g>
+            <g font-size="13" fill="#F3EFE6" text-anchor="middle"><text x="172" y="135">N</text><text x="228" y="135">N</text><text x="172" y="184">N</text><text x="228" y="184">N</text></g>
+          </g>
+          <g class="part" data-part="cauda" id="p-cauda">
+            <line x1="200" y1="160" x2="200" y2="238" stroke="#A69C8A" stroke-width="3"/>
+            <rect x="172" y="238" width="56" height="30" rx="8" fill="#12100D" stroke="#A69C8A" stroke-width="2.5"/>
+            <text x="200" y="258" text-anchor="middle" font-size="12" fill="#F3EFE6">base</text>
+            <path d="M 228 253 L 268 253 L 268 284 L 300 284" fill="none" stroke="#A69C8A" stroke-width="2.5"/>
+            <polygon points="300,272 322,284 300,296" fill="none" stroke="#A69C8A" stroke-width="2.5" stroke-linejoin="round"/>
+            <circle cx="345" cy="284" r="15" fill="#12100D" stroke="#A69C8A" stroke-width="2.5"/>
+            <text x="345" y="289" text-anchor="middle" font-size="13" fill="#F3EFE6">P</text>
+            <path d="M 322 284 L 330 284" stroke="#A69C8A" stroke-width="2.5"/>
+            <path d="M 345 269 Q 330 220 274 182" fill="none" stroke="#A69C8A" stroke-width="2" stroke-dasharray="3 5"/>
+          </g>
+          <g class="part" data-part="cobalto" id="p-cobalto">
+            <circle cx="200" cy="155" r="24" fill="url(#gGoldMol)" stroke="#0E0D0B" stroke-width="3"/>
+            <text x="200" y="161" text-anchor="middle" font-size="17" font-weight="500" fill="#0E0D0B">Co</text>
+          </g>
+          <text x="10" y="314" font-size="11" fill="#A69C8A">esquema simplificado, fora de escala</text>
+        </svg>
+        <div class="picks" role="group" aria-label="Partes da molécula">
+          <button class="pick" data-part="cobalto" aria-pressed="false">Cobalto</button>
+          <button class="pick" data-part="anel" aria-pressed="false">Anel corrina</button>
+          <button class="pick" data-part="metil" aria-pressed="false">Grupo metil</button>
+          <button class="pick" data-part="cauda" aria-pressed="false">Cauda</button>
+        </div>
+        <p class="hint tap"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11V5a2 2 0 0 1 4 0v6"/><path d="M13 10.5V9a2 2 0 0 1 4 0v4.5a6 6 0 0 1-6 6h-.6a6 6 0 0 1-4.6-2.2L4 15a1.8 1.8 0 0 1 2.7-2.4L9 15"/></svg>Toque em uma parte e o Ian explica.</p>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">De onde ela vem</span>
+        <h2>Quem fabrica a B12 são microrganismos</h2>
+        <p class="lead">Nem plantas nem animais produzem B12. Ela é feita por bactérias e se acumula nos alimentos de origem animal. Quem come pouco desses alimentos costuma precisar de outra fonte.</p>
+        <div class="facts" id="sources">
+          <span class="chip">carnes e vísceras</span>
+          <span class="chip">peixes e frutos do mar</span>
+          <span class="chip">ovos</span>
+          <span class="chip">leite e derivados</span>
+          <span class="chip" id="supp"><em>suplementos</em></span>
+        </div>
+        <p class="soft">Vegetarianos, veganos e pessoas com mais idade costumam receber atenção extra sobre a B12. Quem orienta o seu caso é o seu nutricionista ou médico.</p>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">A jornada no organismo</span>
+        <h2>Cinco paradas até chegar às células</h2>
+        <div class="route" role="group" aria-label="Etapas da jornada">
+          <button class="stop" data-step="0" aria-pressed="true"><span class="n">1</span>Boca</button>
+          <button class="stop" data-step="1" aria-pressed="false"><span class="n">2</span>Estômago</button>
+          <button class="stop" data-step="2" aria-pressed="false"><span class="n">3</span>Intestino</button>
+          <button class="stop" data-step="3" aria-pressed="false"><span class="n">4</span>Sangue</button>
+          <button class="stop" data-step="4" aria-pressed="false"><span class="n">5</span>Fígado</button>
+        </div>
+        <p class="hint">Toque em uma parada e o Ian explica.</p>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">Dentro da célula</span>
+        <h2>Dois trabalhos, em dois lugares</h2>
+        <div class="picks" role="group" aria-label="Onde a B12 trabalha">
+          <button class="pick" data-cell="0" aria-pressed="true">No citoplasma</button>
+          <button class="pick" data-cell="1" aria-pressed="false">Na mitocôndria</button>
+        </div>
+        <div id="cellBox"></div>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">O que ela faz</span>
+        <h2>A vitamina B12 auxilia…</h2>
+        <ul class="claims" id="claims">
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></span><span>na formação de células vermelhas do sangue</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/></svg></span><span>no funcionamento do sistema imune</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></span><span>no metabolismo energético</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 11l6-4M9 13l6 4"/></svg></span><span>no metabolismo dos carboidratos, proteínas e gorduras</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h12M12 6l6 6-6 6"/></svg></span><span>no metabolismo da homocisteína</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4.5"/><circle cx="16" cy="12" r="4.5"/></svg></span><span>no processo de divisão celular</span></li>
+        </ul>
+        <p class="fine">Alegações aprovadas pela ANVISA para a vitamina B12 (IN nº 28/2018).</p>
+      </section>
+
+      <section class="slide">
+        <span class="eyebrow">ADR Nutra</span>
+        <h2>Vitamina B12 Metilcobalamina Sublingual</h2>
+        <div class="facts" id="prodFacts">
+          <span class="chip">forma <em>metilcobalamina</em></span>
+          <span class="chip"><em>414%</em> do VD por porção</span>
+          <span class="chip">uso <em>sublingual</em></span>
+        </div>
+        <p>Use conforme a recomendação de consumo indicada no rótulo.</p>
+        <div><button class="pick" id="again">Ver o Ian de novo</button></div>
+        <p class="legal">Este produto não é um medicamento. Não exceder a recomendação diária de consumo indicada na embalagem. Gestantes, lactantes e crianças: consulte um profissional de saúde.</p>
+      </section>
+    </div>
+
+    <div class="ian-wrap" id="ianWrap">
+      <svg id="ian" viewBox="0 -70 300 500" role="img" aria-label="Ian, o mascote da ADR Nutra">
+        <defs>
+          <radialGradient id="gHead" cx="0.36" cy="0.3" r="0.78"><stop offset="0" stop-color="#EBC781"/><stop offset="0.5" stop-color="#C99A4E"/><stop offset="1" stop-color="#7E5C28"/></radialGradient>
+          <radialGradient id="gGold" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#E6BE78"/><stop offset="0.6" stop-color="#C99A4E"/><stop offset="1" stop-color="#86632C"/></radialGradient>
+          <linearGradient id="gBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2E271D"/><stop offset="0.45" stop-color="#1A1610"/><stop offset="1" stop-color="#090807"/></linearGradient>
+          <linearGradient id="gCollar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6BE78"/><stop offset="1" stop-color="#9A7435"/></linearGradient>
+          <radialGradient id="gGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#E6BE78" stop-opacity="0.75"/><stop offset="1" stop-color="#E6BE78" stop-opacity="0"/></radialGradient>
+          <g id="capsule">
+            <path d="M -7 0 L -7 -8 A 7 7 0 0 1 7 -8 L 7 0 Z" fill="url(#gGold)"/>
+            <path d="M -7 0 L 7 0 L 7 8 A 7 7 0 0 1 -7 8 Z" fill="#F3EFE6"/>
+            <rect x="-7" y="-15" width="14" height="30" rx="7" fill="none" stroke="#0E0D0B" stroke-width="3"/>
+            <path d="M -7 0 L 7 0" stroke="#0E0D0B" stroke-width="2"/>
+          </g>
+          <radialGradient id="gSilver" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="0.5" stop-color="#C9C4BA"/><stop offset="1" stop-color="#6E6A62"/></radialGradient><clipPath id="discoClip"><circle cx="150" cy="-40" r="39"/></clipPath><radialGradient id="gDiscoShade" cx="0.35" cy="0.3" r="0.85"><stop offset="0" stop-color="#fff" stop-opacity="0.25"/><stop offset="0.6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></radialGradient><radialGradient id="gDiscoGlow" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFF6E0" stop-opacity="0.55"/><stop offset="1" stop-color="#E6BE78" stop-opacity="0"/></radialGradient><linearGradient id="gBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF3D6" stop-opacity="0.55"/><stop offset="1" stop-color="#E6BE78" stop-opacity="0"/></linearGradient>
+          <path id="star" d="M 0 -10 Q 1.5 -1.5 10 0 Q 1.5 1.5 0 10 Q -1.5 1.5 -10 0 Q -1.5 -1.5 0 -10 Z"/>
+        </defs>
+        <ellipse id="shadow" cx="150" cy="420" rx="80" ry="9" fill="#000" opacity="0.45"/>
+        <g id="fig">
+          <g id="legL"><path id="lLo" d="M 122 328 L 118 364 L 116 400" stroke="#0E0D0B" stroke-width="21" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path id="lLf" d="M 122 328 L 118 364 L 116 400" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse id="fL" cx="112" cy="406" rx="21" ry="12" fill="url(#gGold)" stroke="#0E0D0B" stroke-width="4"/></g>
+          <g id="legR"><path id="lRo" d="M 178 328 L 182 364 L 184 400" stroke="#0E0D0B" stroke-width="21" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path id="lRf" d="M 178 328 L 182 364 L 184 400" stroke="#F3EFE6" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse id="fR" cx="188" cy="406" rx="21" ry="12" fill="url(#gGold)" stroke="#0E0D0B" stroke-width="4"/></g>
+
+          <g id="mag" opacity="0"><ellipse cx="150" cy="190" rx="66" ry="9" fill="url(#gGlow)"/><path d="M 104 192 Q 150 178 196 192 M 116 196 Q 150 186 184 196" fill="none" stroke="#E6BE78" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 5" opacity="0.8"/></g>
+          <g id="head">
+            <circle id="headCircle" cx="150" cy="110" r="78" fill="url(#gHead)" stroke="#000" stroke-width="4"/>
+            <g transform="translate(50 10)">
+              <path d="M 172 64 A 80 80 0 0 1 64 172 A 92 92 0 0 0 172 64 Z" fill="#6E4F20" opacity="0.3"/>
+              <path id="hl" d="M 54 70 Q 60 50 78 42 Q 68 56 63 72 Z" fill="#F3E2BE" opacity="0.6"/>
+              <g id="faceFeat"><g id="browL"><path d="M 66 74 Q 76 65 86 71" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g><g id="browR"><path d="M 114 71 Q 124 65 134 74" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              <!-- olhos -->
+              <g data-eyes="open"><g id="blinker"><ellipse cx="80" cy="93" rx="8.5" ry="12" fill="#0E0D0B"/><ellipse cx="120" cy="93" rx="8.5" ry="12" fill="#0E0D0B"/><circle cx="83" cy="88" r="3" fill="#fff"/><circle cx="123" cy="88" r="3" fill="#fff"/></g></g>
+              <g data-eyes="happy" hidden><path d="M 66 104 Q 76 86 86 104" fill="none" stroke="#0E0D0B" stroke-linecap="round" stroke-width="7"/><path d="M 114 104 Q 124 86 134 104" fill="none" stroke="#0E0D0B" stroke-linecap="round" stroke-width="7"/></g>
+              <g data-eyes="wink" hidden><ellipse cx="80" cy="93" rx="8.5" ry="12" fill="#0E0D0B"/><circle cx="83" cy="88" r="3" fill="#fff"/><path d="M 108 98 Q 120 86 132 98" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              <g data-eyes="up" hidden><ellipse cx="84" cy="89" rx="8" ry="11" fill="#0E0D0B"/><ellipse cx="124" cy="89" rx="8" ry="11" fill="#0E0D0B"/><circle cx="87" cy="84" r="3" fill="#fff"/><circle cx="127" cy="84" r="3" fill="#fff"/></g>
+              <g data-eyes="wide" hidden><ellipse cx="80" cy="90" rx="9" ry="13" fill="#0E0D0B"/><ellipse cx="120" cy="90" rx="9" ry="13" fill="#0E0D0B"/><circle cx="83" cy="85" r="3" fill="#fff"/><circle cx="123" cy="85" r="3" fill="#fff"/></g>
+              <g data-eyes="closed" hidden><path d="M 69 94 Q 80 103 91 94" fill="none" stroke="#0E0D0B" stroke-width="6" stroke-linecap="round"/><path d="M 109 94 Q 120 103 131 94" fill="none" stroke="#0E0D0B" stroke-width="6" stroke-linecap="round"/></g>
+              <g data-eyes="dizzy" hidden><circle cx="80" cy="93" r="13.5" fill="#fff" stroke="#0E0D0B" stroke-width="3"/><g id="spL"><path d="M 81.00 93.00 L 81.08 93.13 L 81.14 93.28 L 81.17 93.44 L 81.19 93.62 L 81.17 93.81 L 81.13 94.00 L 81.06 94.19 L 80.96 94.38 L 80.83 94.56 L 80.66 94.73 L 80.47 94.88 L 80.25 95.00 L 80.01 95.10 L 79.75 95.18 L 79.47 95.21 L 79.18 95.21 L 78.88 95.17 L 78.58 95.09 L 78.28 94.97 L 77.99 94.81 L 77.72 94.60 L 77.47 94.36 L 77.25 94.07 L 77.06 93.76 L 76.90 93.41 L 76.79 93.03 L 76.72 92.64 L 76.71 92.23 L 76.75 91.81 L 76.84 91.39 L 76.98 90.97 L 77.18 90.57 L 77.44 90.19 L 77.75 89.83 L 78.10 89.51 L 78.51 89.23 L 78.95 88.99 L 79.43 88.81 L 79.93 88.69 L 80.46 88.62 L 81.00 88.63 L 81.55 88.70 L 82.09 88.84 L 82.62 89.05 L 83.13 89.33 L 83.61 89.68 L 84.06 90.09 L 84.45 90.55 L 84.79 91.07 L 85.07 91.64 L 85.28 92.25 L 85.42 92.89 L 85.48 93.55 L 85.46 94.22 L 85.35 94.89 L 85.16 95.56 L 84.89 96.21 L 84.53 96.83 L 84.09 97.41 L 83.59 97.94 L 83.01 98.40 L 82.37 98.81 L 81.68 99.13 L 80.94 99.37 L 80.17 99.52 L 79.38 99.58 L 78.57 99.54 L 77.77 99.40 L 76.98 99.16 L 76.21 98.83 L 75.49 98.40 L 74.81 97.87 L 74.19 97.27 L 73.65 96.58 L 73.19 95.82 L 72.81 95.01 L 72.54 94.14 L 72.37 93.24 L 72.32 92.31 L 72.37 91.38 L 72.54 90.45 L 72.82 89.53 L 73.22 88.65 L 73.73 87.81 L 74.34 87.03 L 75.05 86.33 L 75.84 85.71 L 76.71 85.18 L 77.65 84.76 L 78.65 84.46 L 79.68 84.27 L 80.74 84.21 L 81.81 84.28 L 82.87 84.48 L 83.91 84.81 L 84.91 85.27 L 85.86 85.85 L 86.73 86.54 L 87.53 87.35 L 88.23 88.25 L 88.82 89.24 L 89.29 90.30 L 89.63 91.42 L 89.83 92.59 L 89.89 93.78 L 89.81 94.98 L 89.58 96.17 L 89.21 97.33 L 88.70 98.45 L 88.04 99.51 L 87.26 100.49 L 86.36 101.38 L 85.35 102.16 L 84.25 102.81 L 83.06 103.33 L 81.81 103.71 L 80.52 103.93 L 79.19 104.00 L 77.86 103.91 L 76.54 103.65" fill="none" stroke="#0E0D0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="120" cy="93" r="13.5" fill="#fff" stroke="#0E0D0B" stroke-width="3"/><g id="spR"><path d="M 121.00 93.00 L 121.08 93.13 L 121.14 93.28 L 121.17 93.44 L 121.19 93.62 L 121.17 93.81 L 121.13 94.00 L 121.06 94.19 L 120.96 94.38 L 120.83 94.56 L 120.66 94.73 L 120.47 94.88 L 120.25 95.00 L 120.01 95.10 L 119.75 95.18 L 119.47 95.21 L 119.18 95.21 L 118.88 95.17 L 118.58 95.09 L 118.28 94.97 L 117.99 94.81 L 117.72 94.60 L 117.47 94.36 L 117.25 94.07 L 117.06 93.76 L 116.90 93.41 L 116.79 93.03 L 116.72 92.64 L 116.71 92.23 L 116.75 91.81 L 116.84 91.39 L 116.98 90.97 L 117.18 90.57 L 117.44 90.19 L 117.75 89.83 L 118.10 89.51 L 118.51 89.23 L 118.95 88.99 L 119.43 88.81 L 119.93 88.69 L 120.46 88.62 L 121.00 88.63 L 121.55 88.70 L 122.09 88.84 L 122.62 89.05 L 123.13 89.33 L 123.61 89.68 L 124.06 90.09 L 124.45 90.55 L 124.79 91.07 L 125.07 91.64 L 125.28 92.25 L 125.42 92.89 L 125.48 93.55 L 125.46 94.22 L 125.35 94.89 L 125.16 95.56 L 124.89 96.21 L 124.53 96.83 L 124.09 97.41 L 123.59 97.94 L 123.01 98.40 L 122.37 98.81 L 121.68 99.13 L 120.94 99.37 L 120.17 99.52 L 119.38 99.58 L 118.57 99.54 L 117.77 99.40 L 116.98 99.16 L 116.21 98.83 L 115.49 98.40 L 114.81 97.87 L 114.19 97.27 L 113.65 96.58 L 113.19 95.82 L 112.81 95.01 L 112.54 94.14 L 112.37 93.24 L 112.32 92.31 L 112.37 91.38 L 112.54 90.45 L 112.82 89.53 L 113.22 88.65 L 113.73 87.81 L 114.34 87.03 L 115.05 86.33 L 115.84 85.71 L 116.71 85.18 L 117.65 84.76 L 118.65 84.46 L 119.68 84.27 L 120.74 84.21 L 121.81 84.28 L 122.87 84.48 L 123.91 84.81 L 124.91 85.27 L 125.86 85.85 L 126.73 86.54 L 127.53 87.35 L 128.23 88.25 L 128.82 89.24 L 129.29 90.30 L 129.63 91.42 L 129.83 92.59 L 129.89 93.78 L 129.81 94.98 L 129.58 96.17 L 129.21 97.33 L 128.70 98.45 L 128.04 99.51 L 127.26 100.49 L 126.36 101.38 L 125.35 102.16 L 124.25 102.81 L 123.06 103.33 L 121.81 103.71 L 120.52 103.93 L 119.19 104.00 L 117.86 103.91 L 116.54 103.65" fill="none" stroke="#0E0D0B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+              <g data-eyes="hearts" hidden><path d="M 76 114 C 46 96 54 62 76 78 C 98 62 106 96 76 114 Z" fill="#E8102A" stroke="#0E0D0B" stroke-width="3.5" stroke-linejoin="round"/><path d="M 124 114 C 94 96 102 62 124 78 C 146 62 154 96 124 114 Z" fill="#E8102A" stroke="#0E0D0B" stroke-width="3.5" stroke-linejoin="round"/><path d="M 56 90 Q 55 74 67 71 Q 60 79 61 91 Z" fill="#fff" opacity="0.75"/><path d="M 104 90 Q 103 74 115 71 Q 108 79 109 91 Z" fill="#fff" opacity="0.75"/></g>
+              <!-- bocas -->
+              <g data-mouth="grin"><path d="M 75 122 Q 100 119 125 122 Q 136 123 135 135 Q 132 159 100 159 Q 68 159 65 135 Q 64 123 75 122 Z" fill="#fff" stroke="#0E0D0B" stroke-linejoin="round" stroke-width="5"/><g stroke="#0E0D0B" stroke-width="2.5" opacity="0.55"><path d="M 83 124 L 83 155"/><path d="M 100 123 L 100 158"/><path d="M 117 124 L 117 155"/></g></g>
+              <g data-mouth="talk" hidden><path d="M 74 121 Q 100 118 126 121 Q 128 150 100 152 Q 72 150 74 121 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 78 122 Q 100 120 122 122 L 121 129 Q 100 131 79 129 Z" fill="#fff"/><ellipse cx="100" cy="143" rx="12" ry="6" fill="#E2432F"/></g>
+              <g data-mouth="smile" hidden><path d="M 82 128 Q 100 145 118 128" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              <g data-mouth="wide" hidden><path d="M 70 116 Q 100 112 130 116 Q 129 162 100 163 Q 71 162 70 116 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 74 118 Q 100 115 126 118 L 125 125 Q 100 127 75 125 Z" fill="#fff"/><ellipse cx="100" cy="152" rx="15" ry="7" fill="#E2432F"/></g>
+              <g data-mouth="closed" hidden><path d="M 84 134 Q 100 128 116 134" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              <g data-mouth="o" hidden><ellipse cx="100" cy="136" rx="10" ry="13" fill="#0E0D0B"/></g>
+              <g data-mouth="vA" hidden><path d="M 80 122 Q 100 118 120 122 Q 123 152 100 156 Q 77 152 80 122 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 83 123 Q 100 120 117 123 L 116 129 Q 100 131 84 129 Z" fill="#fff"/><ellipse cx="100" cy="148" rx="11" ry="5.5" fill="#E2432F"/></g>
+              <g data-mouth="vE" hidden><path d="M 72 124 Q 100 120 128 124 Q 126 142 100 144 Q 74 142 72 124 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 76 125 Q 100 122 124 125 L 123 131 Q 100 133 77 131 Z" fill="#fff"/><ellipse cx="100" cy="139" rx="12" ry="3.5" fill="#E2432F"/></g>
+              <g data-mouth="vO" hidden><ellipse cx="100" cy="136" rx="12" ry="15" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="3"/><ellipse cx="100" cy="145" rx="7" ry="4" fill="#E2432F"/></g>
+              <g data-mouth="vU" hidden><ellipse cx="100" cy="134" rx="7.5" ry="9" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4"/></g>
+              <g data-mouth="vM" hidden><path d="M 82 132 Q 100 137 118 132" fill="none" stroke="#0E0D0B" stroke-width="7" stroke-linecap="round"/></g>
+              <g data-mouth="vF" hidden><path d="M 82 126 Q 100 123 118 126 Q 116 139 100 140 Q 84 139 82 126 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 85 127 Q 100 125 115 127 L 114 135 Q 100 136 86 135 Z" fill="#fff"/></g>
+              <g data-mouth="vC" hidden><path d="M 78 125 Q 100 121 122 125 Q 120 141 100 142 Q 80 141 78 125 Z" fill="#0E0D0B" stroke="#0E0D0B" stroke-width="4" stroke-linejoin="round"/><path d="M 81 126 Q 100 123 119 126 L 118 132 Q 100 134 82 132 Z" fill="#fff"/></g>
+              <g data-mouth="wavy" hidden><path d="M 80 134 q 5 -6 10 0 t 10 0 t 10 0 t 10 0" fill="none" stroke="#0E0D0B" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>
+              <g data-mouth="flat" hidden><path d="M 86 134 L 116 128" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              <g data-mouth="smirk" hidden><path d="M 82 132 Q 102 144 120 124" fill="none" stroke="#0E0D0B" stroke-width="6.5" stroke-linecap="round"/></g>
+              </g>
+            </g>
+            <g id="dizzy" opacity="0"><use href="#star" fill="#E6BE78"/><use href="#star" fill="#F3EFE6"/><use href="#star" fill="#E6BE78"/></g><g id="sparks"><use class="spark" href="#star" x="236" y="40" fill="#E6BE78"/><use class="spark" href="#star" x="62" y="52" fill="#F3EFE6" transform="scale(1)"/><use class="spark" href="#star" x="250" y="132" fill="#E6BE78"/></g>
+          </g>
+
+          <path id="aLo" stroke="#0E0D0B" stroke-width="19" stroke-linecap="round" fill="none"/>
+          <path id="aLf" stroke="#F3EFE6" stroke-width="13" stroke-linecap="round" fill="none"/>
+          <circle id="hL" r="15" fill="url(#gGold)" stroke="#0E0D0B" stroke-width="4"/>
+          <path id="aRo" stroke="#0E0D0B" stroke-width="19" stroke-linecap="round" fill="none"/>
+          <path id="aRf" stroke="#F3EFE6" stroke-width="13" stroke-linecap="round" fill="none"/>
+          <use id="cap" href="#capsule" opacity="0"/>
+          <circle id="hR" r="15" fill="url(#gGold)" stroke="#0E0D0B" stroke-width="4"/>
+          
+
+          <path transform="translate(76 196) scale(0.44 0.26) translate(-2 -138)" d="M 2 172 Q 2 156 7 150 Q 13 146 13 138 L 327 138 Q 327 146 333 150 Q 338 156 338 172 L 338 615 Q 338 663 290 663 L 50 663 Q 2 663 2 615 Z" fill="url(#gBody)" stroke="#F3EFE6" stroke-width="4.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          <ellipse id="bodyGlow" class="glow" cx="150" cy="262" rx="62" ry="58" fill="url(#gGlow)"/>
+          <rect x="88" y="189" width="124" height="12" rx="5" fill="url(#gCollar)" stroke="#000" stroke-width="4"/>
+          <path d="M 98 192 V 198 M 107 192 V 198 M 116 192 V 198 M 125 192 V 198 M 134 192 V 198 M 143 192 V 198 M 152 192 V 198 M 161 192 V 198 M 170 192 V 198 M 179 192 V 198 M 188 192 V 198 M 197 192 V 198" stroke="#7E5C28" stroke-width="2" stroke-linecap="round"/>
+          <path d="M 84 210 Q 82 250 90 300" fill="none" stroke="#F3EFE6" stroke-width="5" stroke-linecap="round" opacity="0.3"/>
+          <g id="badgeG"><rect id="badge" x="128" y="215" width="44" height="21" fill="none" stroke="#F3EFE6" stroke-width="2.4"/>
+          <text id="badgeTxt" x="151" y="230.5" text-anchor="middle" font-family="DM Sans, sans-serif" font-size="12.5" font-weight="800" letter-spacing="2" fill="#F3EFE6">ADR</text></g>
+          <g id="ball" opacity="0"><g transform="scale(1.75)"><circle r="14" fill="#F3EFE6" stroke="#0E0D0B" stroke-width="3"/><path d="M 0 -5 L 4.8 -1.5 L 3 4 L -3 4 L -4.8 -1.5 Z" fill="#0E0D0B"/><path d="M 0 -5 L 0 -13 M 4.8 -1.5 L 12.5 -4 M 3 4 L 7.5 11 M -3 4 L -7.5 11 M -4.8 -1.5 L -12.5 -4" stroke="#0E0D0B" stroke-width="2"/></g></g><use id="jc0" href="#capsule" opacity="0"/><use id="jc1" href="#capsule" opacity="0"/><use id="jc2" href="#capsule" opacity="0"/>
+        </g>
+              <g id="disco" opacity="0"><g id="discoDrop"><g id="beams" opacity="0.55"><path d="M 150 -40 L 136 220 L 164 220 Z" transform="rotate(-60 150 -40)" fill="url(#gBeam)"/><path d="M 150 -40 L 136 220 L 164 220 Z" transform="rotate(-25 150 -40)" fill="url(#gBeam)"/><path d="M 150 -40 L 136 220 L 164 220 Z" transform="rotate(10 150 -40)" fill="url(#gBeam)"/><path d="M 150 -40 L 136 220 L 164 220 Z" transform="rotate(45 150 -40)" fill="url(#gBeam)"/><path d="M 150 -40 L 136 220 L 164 220 Z" transform="rotate(80 150 -40)" fill="url(#gBeam)"/></g><circle cx="150" cy="-40" r="78" fill="url(#gDiscoGlow)"/><line x1="150" y1="-900" x2="150" y2="-82" stroke="#A69C8A" stroke-width="2.5"/><rect x="145" y="-86" width="10" height="7" rx="2" fill="#C99A4E" stroke="#0E0D0B" stroke-width="2"/><circle cx="150" cy="-40" r="40" fill="url(#gSilver)"/><g clip-path="url(#discoClip)"><g id="facets"><rect class="fc" data-i="0" data-j="0" x="103" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="1" x="110" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="2" x="117" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="3" x="124" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="4" x="131" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="5" x="138" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="6" x="145" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="7" x="152" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="8" x="159" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="9" x="166" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="10" x="173" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="11" x="180" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="12" x="187" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="0" data-j="13" x="194" y="-80" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="0" x="103" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="1" x="110" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="2" x="117" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="3" x="124" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="4" x="131" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="5" x="138" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="6" x="145" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="7" x="152" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="8" x="159" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="9" x="166" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="10" x="173" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="11" x="180" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="12" x="187" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="1" data-j="13" x="194" y="-73" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="0" x="103" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="1" x="110" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="2" x="117" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="3" x="124" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="4" x="131" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="5" x="138" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="6" x="145" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="7" x="152" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="8" x="159" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="9" x="166" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="10" x="173" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="11" x="180" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="12" x="187" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="2" data-j="13" x="194" y="-66" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="0" x="103" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="1" x="110" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="2" x="117" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="3" x="124" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="4" x="131" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="5" x="138" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="6" x="145" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="7" x="152" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="8" x="159" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="9" x="166" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="10" x="173" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="11" x="180" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="12" x="187" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="3" data-j="13" x="194" y="-59" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="0" x="103" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="1" x="110" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="2" x="117" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="3" x="124" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="4" x="131" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="5" x="138" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="6" x="145" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="7" x="152" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="8" x="159" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="9" x="166" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="10" x="173" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="11" x="180" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="12" x="187" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="4" data-j="13" x="194" y="-52" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="0" x="103" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="1" x="110" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="2" x="117" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="3" x="124" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="4" x="131" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="5" x="138" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="6" x="145" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="7" x="152" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="8" x="159" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="9" x="166" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="10" x="173" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="11" x="180" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="12" x="187" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="5" data-j="13" x="194" y="-45" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="0" x="103" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="1" x="110" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="2" x="117" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="3" x="124" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="4" x="131" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="5" x="138" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="6" x="145" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="7" x="152" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="8" x="159" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="9" x="166" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="10" x="173" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="11" x="180" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="12" x="187" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="6" data-j="13" x="194" y="-38" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="0" x="103" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="1" x="110" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="2" x="117" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="3" x="124" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="4" x="131" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="5" x="138" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="6" x="145" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="7" x="152" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="8" x="159" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="9" x="166" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="10" x="173" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="11" x="180" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="12" x="187" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="7" data-j="13" x="194" y="-31" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="0" x="103" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="1" x="110" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="2" x="117" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="3" x="124" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="4" x="131" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="5" x="138" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="6" x="145" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="7" x="152" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="8" x="159" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="9" x="166" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="10" x="173" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="11" x="180" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="12" x="187" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="8" data-j="13" x="194" y="-24" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="0" x="103" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="1" x="110" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="2" x="117" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="3" x="124" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="4" x="131" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="5" x="138" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="6" x="145" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="7" x="152" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="8" x="159" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="9" x="166" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="10" x="173" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="11" x="180" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="12" x="187" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="9" data-j="13" x="194" y="-17" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="0" x="103" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="1" x="110" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="2" x="117" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="3" x="124" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="4" x="131" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="5" x="138" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="6" x="145" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="7" x="152" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="8" x="159" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="9" x="166" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="10" x="173" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="11" x="180" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="12" x="187" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="10" data-j="13" x="194" y="-10" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="0" x="103" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="1" x="110" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="2" x="117" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="3" x="124" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="4" x="131" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="5" x="138" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="6" x="145" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="7" x="152" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="8" x="159" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="9" x="166" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="10" x="173" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="11" x="180" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="12" x="187" y="-3" width="6" height="6" rx="1"/><rect class="fc" data-i="11" data-j="13" x="194" y="-3" width="6" height="6" rx="1"/></g><circle cx="150" cy="-40" r="40" fill="url(#gDiscoShade)"/></g><circle cx="150" cy="-40" r="40" fill="none" stroke="#0E0D0B" stroke-width="3"/><ellipse cx="136" cy="-57" rx="11" ry="7" fill="#fff" opacity="0.75" transform="rotate(-30 136 -57)"/><use class="dglint" href="#star" x="132" y="-60" fill="#fff"/><use class="dglint" href="#star" x="170" y="-46" fill="#fff"/><use class="dglint" href="#star" x="146" y="-22" fill="#fff"/></g></g>
+      </svg>
+    </div>
+
+    <div class="bubble" id="bubble" aria-live="polite"><span class="name">Ian</span><span id="bubbleText"></span></div>
+
+    <nav class="nav" aria-label="Navegação">
+      <div class="dots" id="dots"></div>
+      <button class="btn" id="prev">Voltar</button>
+      <button class="btn primary" id="next">Avançar</button>
+    </nav>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const stage=$('stage'),wrap=$('ianWrap'),svg=$('ian'),bubble=$('bubble'),bubbleText=$('bubbleText');
+const slides=[...document.querySelectorAll('.slide')];
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile=()=>window.innerWidth<=760;
+let cur=0,token=0,smileSeq=0;
+
+/* ---------- rosto ---------- */
+let eyesNow='open',talking=false,mood='neutral',dizzy=false,shake=false,busy=false,headSpin=null,hover=0;
+function face(eyes,mouth,auto){
+  if(!auto)smileSeq++;
+  if(eyes){eyesNow=eyes;svg.querySelectorAll('[data-eyes]').forEach(g=>g.toggleAttribute('hidden',g.dataset.eyes!==eyes));}
+  if(mouth)showMouth(mouth);
+}
+function showMouth(m){svg.querySelectorAll('[data-mouth]').forEach(g=>g.toggleAttribute('hidden',g.dataset.mouth!==m));}
+/* sobrancelhas: neutral | up | curious | focus | soft */
+const BROWS={neutral:[[0,0,0],[0,0,0]],up:[[0,-7,-4],[0,-7,4]],curious:[[0,2,6],[0,-9,6]],focus:[[2,4,12],[-2,4,-12]],soft:[[0,-3,-10],[0,-3,10]]};
+const brow={cur:[[0,0,0],[0,0,0]],goal:BROWS.neutral};
+function brows(n){brow.goal=BROWS[n]||BROWS.neutral;}
+function expr(eyes,mouth,b){face(eyes,mouth);brows(b||'neutral');}
+setInterval(()=>{if(reduce||eyesNow!=='open')return;const b=$('blinker');b.style.transformBox='fill-box';b.style.transformOrigin='50% 50%';b.style.transition='transform .07s';b.style.transform='scaleY(.1)';setTimeout(()=>b.style.transform='',110);},3300);
+function sparkle(){const s=$('sparks');s.classList.remove('sparkle');void s.getBBox();s.classList.add('sparkle');}
+
+/* ---------- palco ---------- */
+function place(p){const q=mobile()?p.m:p.d;wrap.style.setProperty('--x',q[0]+'%');wrap.style.setProperty('--b',q[1]+'%');wrap.style.setProperty('--s',q[2]);}
+let pop=0,strutX=0,swag=0;function bounce(){pop=1;}
+
+/* ---------- olhar (o rosto vira para onde ele aponta) ---------- */
+let lookAt=null; /* elemento | {pt:[x,y]} | null */
+const look={x:0,y:0},glance={next:0,until:0};
+function toIan(x,y){const r=svg.getBoundingClientRect();return[(x-r.left)*300/r.width,(y-r.top)*500/r.height-70];}
+function elPoint(el){const r=el.getBoundingClientRect();const tx=r.width>140?r.left+28:r.left+r.width/2,ty=r.width>140?r.top+r.height/2:r.top+r.height*0.55;return toIan(tx,ty);}
+
+/* ---------- braços maleáveis ---------- */
+const SH={L:[78,226],R:[222,226]};
+const REST={L:[42,290,50,262],R:[258,290,250,262]};
+const arm={L:{h:[42,290],c:[50,262],v:[0,0],vc:[0,0],goal:null},R:{h:[258,290],c:[250,262],v:[0,0],vc:[0,0],goal:null}};
+function setArm(side,goal){arm[side].goal=goal;}
+let pointedEl=null;
+function point(el,side='R'){if(pointedEl&&pointedEl!==el)pointedEl.classList.remove('pointed');pointedEl=el;if(el&&!(el instanceof SVGElement))el.classList.add('pointed');setArm(side,el?{el}:null);lookAt=el||null;}
+function unpoint(){if(pointedEl)pointedEl.classList.remove('pointed');pointedEl=null;lookAt=null;}
+
+function goalFor(side,t){
+  const g=arm[side].goal,S=SH[side];
+  if(!g){
+    if(side==='L'&&talking&&!reduce){const u=Math.sin(t/230),v=Math.sin(t/410);return{h:[34+10*u,232+14*v],c:[34,238]};}
+    const r=REST[side];const w=reduce?0:Math.sin(t/700+(side==='L'?0:1.4))*3;return{h:[r[0],r[1]+w],c:[r[2],r[3]]};
+  }
+  if(g.wave){const u=reduce?0:(Math.sin(t/110)+1)/2;return{h:[292-26*u,168-28*u],c:[272+4*u,214-18*u]};}
+  if(g.chin)return{h:[172,174],c:[262,190]};
+  if(g.present){const u=reduce?0:Math.sin(t/600)*3;return{h:[14,238+u],c:[38,252]};}
+  if(g.count){const u=reduce?0:Math.sin(t/300)*4;return{h:[54,166+u],c:[30,214]};}
+  if(g.cheer){const u=reduce?0:(Math.sin(t/160)+1)/2;const hx=side==='L'?58-6*u:242+6*u;return{h:[hx,138-10*u],c:[side==='L'?40:260,190]};}
+  const T=g.pt?g.pt:elPoint(g.el);
+  const dx=T[0]-S[0],dy=T[1]-S[1],d=Math.hypot(dx,dy)||1;
+  const back=g.pt?0:Math.min(16,d*0.2);
+  const H=[T[0]-dx/d*back,T[1]-dy/d*back];
+  let nx=-dy/d,ny=dx/d;if(ny>0){nx=-nx;ny=-ny;}
+  const bend=g.pt?Math.min(40,d*0.35):Math.min(70,d*0.22)+(reduce?0:Math.sin(t/500)*4);
+  return{h:H,c:[S[0]+dx*0.5+nx*bend,S[1]+dy*0.5+ny*bend]};
+}
+function stepArm(side,t){
+  const a=arm[side],g=goalFor(side,t);
+  if(reduce){a.h=g.h;a.c=g.c;return;}
+  for(let j=0;j<2;j++){
+    a.v[j]=(a.v[j]+(g.h[j]-a.h[j])*0.11)*0.74;a.h[j]+=a.v[j];
+    a.vc[j]=(a.vc[j]+(g.c[j]-a.c[j])*0.08)*0.78;a.c[j]+=a.vc[j];
+  }
+}
+let capState={mode:'hidden',k:0,from:null};
+function render(t){
+  idleTick(t);
+  ['L','R'].forEach(sd=>{
+    stepArm(sd,t);const a=arm[sd],S=SH[sd];
+    const d='M '+S[0]+' '+S[1]+' Q '+a.c[0].toFixed(1)+' '+a.c[1].toFixed(1)+' '+a.h[0].toFixed(1)+' '+a.h[1].toFixed(1);
+    $('a'+sd+'o').setAttribute('d',d);$('a'+sd+'f').setAttribute('d',d);
+    $('h'+sd).setAttribute('cx',a.h[0].toFixed(1));$('h'+sd).setAttribute('cy',a.h[1].toFixed(1));
+  });
+  /* cápsula: deitada inteira sobre a mãozinha, depois entra na boca */
+  const cap=$('cap'),a=arm.R;
+  if(capState.mode==='palm'){
+    cap.setAttribute('transform','translate('+a.h[0].toFixed(1)+' '+(a.h[1]-20).toFixed(1)+') rotate(90)');cap.setAttribute('opacity','1');
+  }else if(capState.mode==='eat'){
+    capState.k=Math.min(1,capState.k+(reduce?1:0.06));const k=capState.k,f=capState.from;
+    const x=f[0]+(150-f[0])*k,y=f[1]+(152-f[1])*k,s=1-k*0.8;
+    cap.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate(90) scale('+s.toFixed(2)+')');cap.setAttribute('opacity',k>=1?'0':'1');
+  }else cap.setAttribute('opacity','0');
+
+  /* olhar */
+  let lx=0,ly=0;
+  /* de vez em quando ele olha rápido para quem está assistindo */
+  if(!glance.next)glance.next=t+4500;
+  if(lookAt&&!busy&&!reduce&&t>glance.next){glance.until=t+900;glance.next=t+5000+Math.random()*3500;}
+  const glancing=t<glance.until;
+  if(lookAt&&!glancing){const T=lookAt.pt?lookAt.pt:elPoint(lookAt);lx=Math.max(-1,Math.min(1,(T[0]-150)/130));ly=Math.max(-1,Math.min(1,(T[1]-110)/150));}
+  else if(!reduce&&!glancing){lx=Math.sin(t/2300)*0.12;ly=Math.sin(t/1900)*0.08;}
+  const ease=reduce?1:0.09;look.x+=(lx-look.x)*ease;look.y+=(ly-look.y)*ease;
+  const ox=look.x*18,oy=look.y*9,sx=1-Math.abs(look.x)*0.12;
+  const ff=$('faceFeat');
+  if(headSpin!==null){
+    /* a cabeça gira como um globo: o rosto passa pela lateral e some atrás */
+    const c=Math.cos(headSpin),gx=Math.sin(headSpin)*50;
+    ff.style.display=c>0.04?'':'none';
+    ff.setAttribute('transform','translate('+(100+gx).toFixed(2)+' 100) scale('+Math.max(0.04,c).toFixed(3)+' 1) translate(-100 -100)');
+  }else{ff.style.display='';ff.setAttribute('transform','translate('+(100+ox).toFixed(2)+' '+(100+oy).toFixed(2)+') scale('+sx.toFixed(3)+' 1) translate(-100 -100)');}
+  hover+=((headSpin!==null?1:0)-hover)*0.08;
+  $('mag').setAttribute('opacity',(hover*0.95).toFixed(2));
+  $('hl').setAttribute('transform','translate('+(-look.x*5).toFixed(2)+' 0)');
+  /* sobrancelhas */
+  ['L','R'].forEach((sd,i)=>{const c=brow.cur[i],g=brow.goal[i];for(let j=0;j<3;j++)c[j]+=(g[j]-c[j])*(reduce?1:0.15);
+    const cx=sd==='L'?76:124;$('brow'+sd).setAttribute('transform','translate('+c[0].toFixed(2)+' '+c[1].toFixed(2)+') rotate('+c[2].toFixed(2)+' '+cx+' 70)');});
+
+  /* corpo vivo */
+  pop*=0.9;
+  const bob=reduce?0:Math.sin(t/420)*2.2;
+  let tilt=(reduce?0:(talking?Math.sin(t/260)*2.5:Math.sin(t/1300)*1.5))+look.x*5;
+  if(dizzy){tilt+=Math.sin(t/120)*8;}
+  if(shake){tilt+=Math.sin(t/38)*9;}
+  const dz=$('dizzy');dz.setAttribute('opacity',dizzy?'1':'0');
+  if(eyesNow==='dizzy'){const a=(t/4)%360;$('spL').setAttribute('transform','rotate('+(-a).toFixed(1)+' 80 93)');$('spR').setAttribute('transform','rotate('+(-a).toFixed(1)+' 120 93)');}
+  if(dizzy){[...dz.children].forEach((u,i)=>{const an=t/280+i*2.094;u.setAttribute('x',(150+66*Math.cos(an)).toFixed(1));u.setAttribute('y',(26+13*Math.sin(an)).toFixed(1));});}
+  if(!(IDLE.on&&IDLE.kind===2)){strutX*=0.9;swag*=0.9;}
+  bodyTurn+=((turnOverride!==null?turnOverride:look.x*0.8)-bodyTurn)*(reduce?1:0.12);
+  $('badgeG').setAttribute('transform','translate('+(150+bodyTurn*28).toFixed(2)+' 225) scale('+(1-Math.abs(bodyTurn)*0.3).toFixed(3)+' 1) translate(-150 -225)');
+  const lean=look.x*2.5+swag,sq=1+pop*0.06;
+  $('fig').setAttribute('transform','rotate('+lean.toFixed(2)+' 150 420) translate(150 420) scale('+(2-sq).toFixed(3)+' '+sq.toFixed(3)+') translate(-150 -420) translate('+strutX.toFixed(2)+' '+(bob-pop*14).toFixed(2)+')');
+  $('head').setAttribute('transform','translate(0 '+(-hover*9+(headSpin!==null?Math.sin(t/180)*2:0)).toFixed(2)+') rotate('+(headSpin!==null?tilt*0.3:tilt).toFixed(2)+' 150 188)');
+  placeBubble();
+  requestAnimationFrame(render);
+}
+
+/* ---------- pernas com joelho (para o moonwalk) ---------- */
+const HIP={L:[122,328],R:[178,328]},LEG0={L:'M 122 328 L 118 364 L 116 400',R:'M 178 328 L 182 364 L 184 400'},FOOT0={L:[112,406],R:[188,406]};
+function legPose(sd,ax,ay,face,heel){
+  /* perna maleável como os braços: uma curva só, que estica ou se curva conforme a distância */
+  const H=HIP[sd],dx=ax-H[0],dy=ay-H[1],d=Math.hypot(dx,dy)||1,REST=72;
+  let nx=-dy/d,ny=dx/d;if(nx*face<0){nx=-nx;ny=-ny;}
+  const slack=Math.sqrt(Math.max(0,REST*REST-d*d))*0.55,bend=slack+4+heel*8;
+  const cx0=H[0]+dx/2+nx*bend,cy0=H[1]+dy/2+ny*bend;
+  const dd='M '+H[0]+' '+H[1]+' Q '+cx0.toFixed(1)+' '+cy0.toFixed(1)+' '+ax.toFixed(1)+' '+ay.toFixed(1);
+  $('l'+sd+'o').setAttribute('d',dd);$('l'+sd+'f').setAttribute('d',dd);
+  /* o pé fica preso no tornozelo e gira em volta dele (ponta para baixo quando o calcanhar sobe) */
+  const cx=ax+face*6,cy=ay+5,f=$('f'+sd);f.setAttribute('cx',cx.toFixed(1));f.setAttribute('cy',cy.toFixed(1));
+  f.setAttribute('transform','rotate('+(face*heel*34).toFixed(1)+' '+ax.toFixed(1)+' '+ay.toFixed(1)+')');
+}
+function resetLegs(){['L','R'].forEach(sd=>{$('l'+sd+'o').setAttribute('d',LEG0[sd]);$('l'+sd+'f').setAttribute('d',LEG0[sd]);const f=$('f'+sd);f.setAttribute('cx',FOOT0[sd][0]);f.setAttribute('cy',FOOT0[sd][1]);f.removeAttribute('transform');});}
+let turnOverride=null,bodyTurn=0;
+
+/* ---------- tela parada: o Ian se diverte sozinho ---------- */
+let lastActivity=performance.now();
+const IDLE={on:false,kind:0,t0:0,saved:null,beat:-1,intro:false,fshift:null,said:new Set(),quiet:false};
+const IDLE_LINES=['Tá parado aí? Vou treinar umas <b>embaixadinhas</b>!','Agora um malabarismo com as minhas <b>cápsulas</b>!','Solta o som! Hora da <b>dancinha</b>!'];
+function markActive(){lastActivity=performance.now();if(IDLE.on)stopIdle();}
+['pointerdown','keydown','wheel','touchstart'].forEach(ev=>document.addEventListener(ev,markActive,{passive:true,capture:true}));
+function hideProps(){
+  headSpin=null;
+  $('ball').setAttribute('opacity','0');for(let i=0;i<3;i++)$('jc'+i).setAttribute('opacity','0');
+  $('disco').setAttribute('opacity','0');$('discoLights').classList.remove('on');
+  $('legL').removeAttribute('transform');$('legR').removeAttribute('transform');resetLegs();turnOverride=null;
+}
+function startIdle(t){
+  IDLE.on=true;IDLE.t0=t;IDLE.beat=-1;IDLE.intro=false;
+  IDLE.saved={L:arm.L.goal,R:arm.R.goal,look:lookAt};
+  if(pointedEl)pointedEl.classList.remove('pointed');
+}
+function stopIdle(){
+  IDLE.on=false;hideProps();bubble.style.opacity='1';
+  const sv=IDLE.saved||{};setArm('L',sv.L||null);setArm('R',sv.R||null);lookAt=sv.look||null;
+  if(pointedEl)pointedEl.classList.add('pointed');
+  expr('open','smile','neutral');
+}
+function nextIdle(t){hideProps();IDLE.kind=(IDLE.kind+1)%3;IDLE.t0=t;IDLE.beat=-1;IDLE.intro=false;}
+function idleTick(t){
+  if(!IDLE.on){if(!busy&&!talking&&!reduce&&t-lastActivity>10000)startIdle(t);else return;}
+  let it=t-IDLE.t0;
+  if(it>(IDLE.kind===2?18600:9500)){nextIdle(t);it=0;}
+  if(!IDLE.intro){IDLE.intro=true;IDLE.quiet=IDLE.said.has(IDLE.kind);if(!IDLE.quiet){IDLE.said.add(IDLE.kind);say(IDLE_LINES[IDLE.kind],token,{talk:'happy',after:'grin'}).catch(()=>{});}}
+  bubble.style.opacity=((it>3800||IDLE.quiet)&&!talking)?'0':'1';
+  const k=IDLE.kind;
+  if(k===0){ /* embaixadinha */
+    const P=720,n=Math.floor(it/P),ph=(it%P)/P;
+    const fx=i=>i%2?112:188,x=fx(n)+(fx(n+1)-fx(n))*ph,y=368-175*Math.sin(Math.PI*ph);
+    const b=$('ball');b.setAttribute('opacity','1');b.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+((t/3)%360).toFixed(0)+')');
+    const kick=Math.max(0,1-ph*5),ant=ph>0.82?(ph-0.82)/0.18:0,lift=Math.max(kick,ant*0.5);
+    $('legR').setAttribute('transform',n%2?'':'rotate('+(-18*lift).toFixed(1)+' 178 328)');
+    $('legL').setAttribute('transform',n%2?'rotate('+(18*lift).toFixed(1)+' 122 328)':'');
+    if(n!==IDLE.beat){IDLE.beat=n;pop=0.5;if(!talking){if(n%6===5)expr('happy','grin','up');else expr('open','smirk','focus');}}
+    const w=Math.sin(t/300)*6;setArm('L',{pt:[20,246+w]});setArm('R',{pt:[280,246-w]});
+    lookAt={pt:[x,y]};
+  }else if(k===1){ /* malabarismo com 3 cápsulas */
+    const T=480,u0=it,Lb=[30,244],Rb=[270,244];
+    const sw=Math.sin(u0/T*Math.PI);
+    const Lh=[Lb[0]+10*sw,Lb[1]+6*Math.cos(u0/T*Math.PI)],Rh=[Rb[0]-10*sw,Rb[1]-6*Math.cos(u0/T*Math.PI)];
+    setArm('L',{pt:Lh});setArm('R',{pt:Rh});
+    let high=null;
+    for(let i=0;i<3;i++){
+      const u=((u0-i*2*T)%(6*T)+6*T)%(6*T);let x,y,r=0;
+      if(u<2*T){const f=u/(2*T);x=Lh[0]+(Rh[0]-Lh[0])*f;y=Lh[1]-14-226*4*f*(1-f);r=f*360;}
+      else if(u<3*T){x=Rh[0];y=Rh[1]-16;}
+      else if(u<5*T){const f=(u-3*T)/(2*T);x=Rh[0]+(Lh[0]-Rh[0])*f;y=Rh[1]-14-226*4*f*(1-f);r=-f*360;}
+      else{x=Lh[0];y=Lh[1]-16;}
+      const c=$('jc'+i);c.setAttribute('opacity','1');c.setAttribute('transform','translate('+x.toFixed(1)+' '+y.toFixed(1)+') rotate('+(90+r).toFixed(0)+')');
+      if(!high||y<high[1])high=[x,y];
+    }
+    lookAt={pt:high};
+    const lc=it%3200,lift=lc>1500&&lc<2900?Math.sin((lc-1500)/1400*Math.PI):0,lside=Math.floor(it/3200)%2;
+    $('legL').setAttribute('transform',lside?'':'rotate('+(34*Math.min(1,lift*1.6)).toFixed(1)+' 122 328)');
+    $('legR').setAttribute('transform',lside?'rotate('+(-34*Math.min(1,lift*1.6)).toFixed(1)+' 178 328)':'');
+    const beat=Math.floor(it/(T*6));
+    if(beat!==IDLE.beat){IDLE.beat=beat;if(!talking){if(beat%2)expr('happy','grin','up');else expr('wide','o','up');}}
+  }else{ /* dancinha com bola de discoteca */
+    const d=$('disco');d.setAttribute('opacity','1');$('discoLights').classList.add('on');
+    const drop=it<800?-320*(1-it/800)*(1-it/800):(it>18000?-320*((it-18000)/600)*((it-18000)/600):0);
+    $('discoDrop').setAttribute('transform','translate(0 '+drop.toFixed(1)+')');
+    const sc=t/22,shift=Math.floor(sc/7);
+    $('facets').setAttribute('transform','translate('+(-(sc%7)).toFixed(2)+' 0)');
+    if(shift!==IDLE.fshift){IDLE.fshift=shift;const pal=['#FFFFFF','#E9E4DA','#B9B3A8','#8C877E','#F6E3BC'];
+      document.querySelectorAll('#facets .fc').forEach(r=>{const i=+r.dataset.i,j=+r.dataset.j;r.setAttribute('fill',pal[((i*7+(j+shift)*3)%11+11)%11%5]);});}
+    document.querySelectorAll('#disco .dglint').forEach((g,i)=>{const v=Math.max(0,Math.sin(t/260+i*2.1)),k=0.4+v;g.setAttribute('opacity',v.toFixed(2));g.setAttribute('transform','translate('+(g.getAttribute('x')*(1-k)).toFixed(1)+' '+(g.getAttribute('y')*(1-k)).toFixed(1)+') scale('+k.toFixed(2)+')');});
+    $('beams').setAttribute('transform','rotate('+((t/40)%360).toFixed(1)+' 150 -40)');
+    if(it<9000){
+    /* dancinha com gingado: anda de lado, ombros soltos, dedos apontando para quem assiste */
+    const B=520,n=Math.floor(it/B),ph=(it%B)/B,bar=n%8;
+    strutX=30*Math.sin(it/(B*8)*Math.PI*2);
+    swag=Math.sin(it/B*Math.PI)*5*(n%2?1:-1);
+    if(n!==IDLE.beat){IDLE.beat=n;pop=0.55;if(!talking){if(bar===7)expr('wink','smirk','curious');else if(bar===3)expr('happy','grin','up');else expr('open','smirk','curious');}}
+    if(bar>=6){const u=Math.sin(ph*Math.PI);setArm('R',{pt:[292,70-10*u]});setArm('L',{pt:[60,150+10*u]});lookAt={pt:[300,40]};}
+    else if(bar<3){setArm('R',{pt:[300,232+Math.sin(ph*Math.PI*2)*6]});setArm('L',{pt:[74,286]});lookAt=null;}
+    else{setArm('L',{pt:[0,232+Math.sin(ph*Math.PI*2)*6]});setArm('R',{pt:[226,286]});lookAt=null;}
+    const kick=Math.sin(ph*Math.PI);
+    $('legL').setAttribute('transform',n%2?'rotate('+(16*kick).toFixed(1)+' 122 328)':'');
+    $('legR').setAttribute('transform',n%2?'':'rotate('+(-16*kick).toFixed(1)+' 178 328)');
+    }else{
+      /* moonwalk: um pé apoiado na ponta (calcanhar erguido) e o outro deslizando para trás, alternando */
+      const m=it-9000;
+      const easeIO=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      swag*=0.85;
+      const S=520,G=190;
+      const moon=(face,k0,from,to)=>{
+        const mm=m-k0,k=mm/3000,g=G*S/3000*1.25;
+        strutX=from+(to-from)*k;turnOverride=face*0.85;lookAt={pt:[face>0?330:-30,150]};
+        /* passos contínuos: cada pé avança na ponta e volta deslizando, em ondas suaves e opostas */
+        const ph=mm/(2*S)*Math.PI*2;
+        ['L','R'].forEach((sd,i)=>{
+          const q=ph+(i?Math.PI:0),off=-(g/2)*Math.cos(q),heel=Math.max(0,Math.sin(q));
+          const base=sd==='L'?124:176;
+          legPose(sd,base+face*off,400-8*heel,face,heel);
+        });
+        const sw=Math.sin(mm/S*Math.PI);
+        if(face>0){setArm('R',{pt:[208,214]});setArm('L',{pt:[46+sw*8,270]});}else{setArm('L',{pt:[92,214]});setArm('R',{pt:[254-sw*8,270]});}
+        pop=Math.max(pop,Math.abs(Math.sin(mm/S*Math.PI))*0.08);
+      };
+      if(m<600){ /* anuncia só na primeira vez */
+        if(IDLE.beat!=='mw0'){IDLE.beat='mw0';expr('wink','smirk','curious');pop=0.7;if(!IDLE.said.has('mw')){IDLE.said.add('mw');say('Agora o <b>moonwalk</b>!',token,{after:'smirk'}).catch(()=>{});}}
+        setArm('R',{pt:[214,206]});setArm('L',{pt:[60,280]});turnOverride=0.85;
+      }else if(m<3600){ /* desliza para a esquerda olhando para a direita */
+        moon(1,600,40,-55);
+        if(IDLE.beat!=='mw1'){IDLE.beat='mw1';expr('open','smirk','curious');}
+      }else if(m<4200){ /* gira a cabeça como um globo e troca de lado */
+        const k=(m-3600)/600;headSpin=easeIO(k)*Math.PI*2;pop=Math.max(pop,0.3);resetLegs();turnOverride=0.85-1.7*easeIO(k);
+        if(IDLE.beat!=='mw2'){IDLE.beat='mw2';sparkle();}
+      }else if(m<7200){ /* desliza para a direita olhando para a esquerda */
+        if(headSpin!==null)headSpin=null;
+        moon(-1,4200,-55,40);
+        if(IDLE.beat!=='mw3'){IDLE.beat='mw3';expr('wink','smirk','curious');}
+      }else if(m<8400){ /* pose final na ponta dos pés, braço para o alto */
+        resetLegs();turnOverride=null;strutX*=0.92;lookAt={pt:[230,-40]};
+        $('legL').setAttribute('transform','translate(0 -8) rotate(-6 122 328)');$('legR').setAttribute('transform','translate(0 -8) rotate(6 178 328)');
+        setArm('R',{pt:[236,-24]});setArm('L',{pt:[70,272]});
+        if(IDLE.beat!=='mw4'){IDLE.beat='mw4';expr('happy','grin','up');sparkle();pop=1;}
+      }else{
+        strutX*=0.9;lookAt=null;turnOverride=null;resetLegs();$('legL').removeAttribute('transform');$('legR').removeAttribute('transform');
+        setArm('R',null);setArm('L',null);
+      }
+    }
+  }
+}
+
+/* ---------- balão ---------- */
+function placeBubble(){
+  const sr=stage.getBoundingClientRect(),hr=$('headCircle').getBoundingClientRect();
+  const bw=bubble.offsetWidth,bh=bubble.offsetHeight;
+  if(mobile()){
+    bubble.classList.add('side');
+    const left=hr.right-sr.left+12;let top=hr.top-sr.top+4;
+    bubble.style.width=Math.max(150,sr.width-left-14)+'px';
+    top=Math.min(top,sr.height-bh-70);
+    bubble.style.left=left+'px';bubble.style.top=top+'px';
+  }else{
+    bubble.classList.remove('side');bubble.style.width='';
+    const cx=hr.left+hr.width/2-sr.left,maxL=sr.width*0.47-bw;
+    const left=Math.max(14,Math.min(cx-60,maxL)),top=Math.max(14,hr.top-sr.top-bh-18);
+    bubble.style.left=left+'px';bubble.style.top=top+'px';
+    bubble.style.setProperty('--tail',Math.max(20,Math.min(bw-40,cx-left-10))+'px');
+  }
+}
+
+/* ---------- leitura labial: cada letra vira um formato de boca ---------- */
+function viseme(ch,prev,rest){
+  const c=ch.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(/[.!?…,;:]/.test(c))return rest;
+  if(c===' ')return prev==='vM'?'vC':(prev||'vC');
+  if(c==='a')return 'vA';
+  if(c==='e'||c==='i'||c==='y')return 'vE';
+  if(c==='o')return 'vO';
+  if(c==='u'||c==='w')return 'vU';
+  if('mbp'.includes(c))return 'vM';
+  if('fv'.includes(c))return 'vF';
+  if(/[a-z0-9ç]/.test(c))return (prev==='vA'||prev==='vE'||prev==='vO')?prev.replace(/v[AEO]/,'vC'):'vC';
+  return prev||'vC';
+}
+/* ---------- fala com digitação ---------- */
+const sleep=(ms,tk)=>new Promise((res,rej)=>setTimeout(()=>tk===token?res():rej('cancel'),reduce?Math.min(ms,300):ms));
+let typing=null;
+/* talk: como a boca se mexe ('neutral' | 'happy' | 'amazed'); after: boca no fim; smile: fecha os olhos sorrindo no fim */
+function say(html,tk,{after='smile',talk='neutral',smile=false}={}){
+  return new Promise((res,rej)=>{
+    clearTimeout(typing);if(!IDLE.on)lastActivity=performance.now();
+    const tmp=document.createElement('div');tmp.innerHTML=html;
+    bubbleText.innerHTML='';
+    const chars=[];
+    (function build(src,dst){src.childNodes.forEach(n=>{
+      if(n.nodeType===3){for(const c of n.textContent){const sp=document.createElement('span');sp.className='ch';sp.textContent=c;dst.appendChild(sp);chars.push(sp);}}
+      else if(n.nodeType===1){const el=document.createElement(n.tagName);build(n,el);dst.appendChild(el);}
+    });})(tmp,bubbleText);
+    const caret=document.createElement('span');caret.className='caret';caret.setAttribute('aria-hidden','true');
+    const rest={neutral:'smile',happy:'grin',amazed:'o'}[talk];
+    const finish=()=>{
+      talking=false;caret.remove();showMouth(after);if(!IDLE.on)lastActivity=performance.now();
+      if(smile&&!reduce){const id=++smileSeq,prev=eyesNow==='happy'?'open':eyesNow;face('happy',null,true);setTimeout(()=>{if(id===smileSeq&&eyesNow==='happy')face(prev,null,true);},1300);}
+      setTimeout(()=>tk===token?res():rej('cancel'),reduce?0:500+chars.length*14);
+    };
+    if(reduce){chars.forEach(c=>c.classList.add('in'));finish();return;}
+    talking=true;let i=0,lastVis=rest;
+    const tick=()=>{
+      if(tk!==token){talking=false;caret.remove();rej('cancel');return;}
+      const c=chars[i];c.classList.add('in');c.after(caret);i++;
+      const ch=c.textContent;
+      const v=viseme(ch,lastVis,rest);lastVis=v;showMouth(v);
+      if(i>=chars.length){finish();return;}
+      typing=setTimeout(tick,/[.!?…]/.test(ch)?420:(/[,;:]/.test(ch)?220:58));
+    };
+    bubbleText.prepend(caret);typing=setTimeout(tick,120);
+  });
+}
+
+/* ---------- conteúdo ---------- */
+const MOL={
+  cobalto:['Esse é o <b>cobalto</b>, o átomo do centro. É por ele que a B12 se liga às enzimas para trabalhar.','up'],
+  anel:['Quatro anéis com nitrogênio formam o <b>anel corrina</b>. Ele segura o cobalto no lugar, como o engaste de uma joia.','curious'],
+  metil:['Esse pedacinho é o <b>grupo metil</b>, o CH₃. É ele que dá o nome à metilcobalamina.','soft'],
+  cauda:['A <b>cauda</b> tem uma base, um açúcar e um fosfato. Ela dobra por baixo e ajuda a deixar a molécula estável.','focus']
+};
+const ROUTE=[
+  ['Tudo começa na <b>boca</b>. No formato sublingual, o produto fica embaixo da língua até dissolver, como diz o rótulo.','open','smile','soft','neutral'],
+  ['No <b>estômago</b>, o ácido solta a B12 dos alimentos. Ela se prende à haptocorrina, uma proteína protetora que vem da saliva.','wide','o','up','amazed'],
+  ['No <b>intestino</b>, ela troca de par e se une ao fator intrínseco. Juntos, são absorvidos no final do intestino delgado.','open','smirk','curious','neutral'],
+  ['No <b>sangue</b>, quem leva a B12 é a transcobalamina. Ela entrega a vitamina para as células do corpo.','open','smile','focus','neutral'],
+  ['O que sobra fica guardado no <b>fígado</b>, que mantém uma reserva de B12.','wink','grin','soft','happy']
+];
+const arrowSvg='<svg viewBox="0 0 100 14" aria-hidden="true"><path d="M2 7 H94 M86 1 L96 7 L86 13" fill="none" stroke="#C99A4E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CELL=[
+  {html:'<div class="rx"><span class="mname">Homocisteína</span><span class="arr" id="arr0">metionina sintase'+arrowSvg+'+ metilcobalamina</span><span class="mname">Metionina</span></div>',
+   say:'No <b>citoplasma</b>, a metilcobalamina entrega o grupo metil e ajuda a transformar homocisteína em metionina. O folato participa junto.'},
+  {html:'<div class="rx"><span class="mname">Metilmalonil-CoA</span><span class="arr" id="arr1">mutase'+arrowSvg+'+ adenosilcobalamina</span><span class="mname">Succinil-CoA</span></div>',
+   say:'Na <b>mitocôndria</b>, a outra forma ativa, a adenosilcobalamina, ajuda a tirar energia de gorduras e proteínas.'}
+];
+const CLAIMS=['na formação de células vermelhas do sangue','no funcionamento do sistema imune','no metabolismo energético','no metabolismo dos carboidratos, proteínas e gorduras','no metabolismo da homocisteína','no processo de divisão celular'];
+const CLAIM_FACE=[['open','smile','soft'],['wide','smile','up'],['happy','grin','neutral'],['open','smirk','curious'],['open','smile','focus'],['wink','grin','soft']];
+
+const SCENES=[
+  {d:[22,3,1.3],m:[30,1,.68],run:async tk=>{
+    expr('happy','grin','up');bounce();sparkle();setArm('R',{wave:true});
+    await say('Oi! Eu sou o <b>Ian</b>, da ADR Nutra.',tk,{talk:'happy',after:'grin'});
+    await sleep(500,tk);expr('open','smile','soft');setArm('R',null);setArm('L',{present:true});
+    await say('Hoje eu vou te mostrar como a vitamina B12 trabalha no seu corpo.',tk);
+    setArm('L',null);await sleep(300,tk);point($('formula'));expr('wink','smirk','curious');bounce();
+    await say('Começando pela minha favorita: a fórmula da <b>metilcobalamina</b>.',tk,{after:'grin',smile:true});
+    await sleep(900,tk);sparkle();
+  }},
+  {d:[19,4,1.0],m:[24,1,.6],run:async tk=>{
+    expr('wide','o','up');bounce();lookAt=$('mol');
+    await say('Olha que curioso: a B12 é a única vitamina com um <b>metal</b> no meio.',tk,{talk:'amazed',after:'o'});
+    for(const part of ['cobalto','anel','metil','cauda']){await sleep(350,tk);await showPart(part,tk);}
+    unpoint();setArm('L',null);expr('happy','grin','up');$('mol').classList.remove('focus');
+    point(document.querySelector('.picks[aria-label="Partes da molécula"]'));
+    await say('Quer ouvir de novo? É só <b>tocar</b> numa parte que eu explico.',tk,{after:'grin',smile:true});
+  }},
+  {d:[20,3,1.1],m:[26,1,.64],run:async tk=>{
+    expr('up','flat','focus');setArm('R',{chin:true});lookAt={pt:[230,-40]};
+    await say('Pensa comigo: o nosso corpo <b>não fabrica</b> B12.',tk,{after:'flat'});
+    await sleep(800,tk);expr('open','smile','soft');point($('sources'));setArm('L',{present:true});
+    await say('Ela vem de alimentos de origem animal, que acumulam a B12 feita por bactérias.',tk);
+    setArm('L',null);await sleep(300,tk);point($('supp'));expr('wink','smirk','curious');bounce();
+    await say('Ou de um <b>suplemento</b>, como o da ADR Nutra.',tk,{after:'grin',smile:true});
+  }},
+  {d:[18,4,.95],m:[22,1,.6],run:async tk=>{
+    expr('happy','grin','up');setArm('L',{cheer:true});bounce();
+    await say('Agora vem a viagem! São cinco paradas.',tk,{talk:'happy',after:'grin'});
+    setArm('L',null);
+    for(let i=0;i<5;i++){await sleep(300,tk);await showStop(i,tk);}
+    expr('happy','grin','up');point(document.querySelector('.route'));
+    await say('Quer rever alguma parada? É só <b>tocar</b> nela.',tk,{after:'grin',smile:true});
+  }},
+  {d:[19,4,1.0],m:[24,1,.6],run:async tk=>{
+    await showCell(0,tk);await sleep(400,tk);await showCell(1,tk);await sleep(300,tk);
+    expr('happy','grin','up');point(document.querySelector('.picks[aria-label="Onde a B12 trabalha"]'));
+    await say('Toque nos botões para trocar entre os dois lugares.',tk,{after:'grin'});
+  }},
+  {d:[18,4,.95],m:[22,1,.6],run:async tk=>{
+    expr('happy','grin','up');setArm('L',{cheer:true});setArm('R',{cheer:true});bounce();sparkle();
+    await say('E é isso que a B12 faz, do jeito que a <b>ANVISA</b> reconhece.',tk,{talk:'happy',after:'grin'});
+    setArm('L',{count:true});
+    const lis=[...document.querySelectorAll('#claims li')];
+    for(let i=0;i<lis.length;i++){
+      lis.forEach(l=>l.classList.remove('lit'));lis[i].classList.add('lit');point(lis[i]);
+      const f=CLAIM_FACE[i];expr(f[0],f[1],f[2]);
+      await say('A vitamina B12 auxilia '+CLAIMS[i]+'.',tk,{after:f[1]});
+      await sleep(700,tk);
+    }
+    lis.forEach(l=>l.classList.remove('lit'));unpoint();setArm('R',null);setArm('L',null);expr('happy','grin','up');sparkle();bounce();
+  }},
+  {d:[24,3,1.4],m:[34,1,.75],run:async tk=>{await eatShow(tk);}}
+];
+
+async function eatShow(tk){
+  unpoint();setArm('R',null);setArm('L',null);capState={mode:'hidden',k:0};
+  expr('open','smirk','curious');
+  await say('Agora é a minha hora. Olha só!',tk,{after:'smirk'});
+  /* mostra a cápsula inteira na palma da mão e olha para ela */
+  setArm('R',{pt:[226,180]});capState.mode='palm';lookAt={pt:[226,150]};expr('wide','o','up');bounce();
+  await sleep(1300,tk);
+  /* leva à boca: fecha os olhos e abre a boca com a língua */
+  lookAt=null;setArm('R',{pt:[154,184]});expr('closed','wide','soft');
+  await sleep(900,tk);
+  capState={mode:'eat',k:0,from:[arm.R.h[0],arm.R.h[1]-20]};
+  await sleep(380,tk);
+  /* fecha a boca e saboreia */
+  expr('closed','closed','soft');setArm('R',null);bounce();
+  for(let i=0;i<3;i++){await sleep(170,tk);showMouth('smile');await sleep(170,tk);showMouth('closed');}
+  $('bodyGlow').classList.add('on');await sleep(600,tk);$('bodyGlow').classList.remove('on');
+  /* sorri depois de consumir */
+  expr('happy','grin','up');sparkle();bounce();
+  await say('Hmm! Prontinho, minha <b>B12</b> do dia.',tk,{talk:'happy',after:'grin'});
+  await sleep(500,tk);expr('wink','smirk','curious');point($('prodFacts'));
+  await say('Metilcobalamina, sublingual, da <b>ADR Nutra</b>. Até a próxima!',tk,{after:'grin',smile:true});
+  await sleep(500,tk);unpoint();setArm('R',{wave:true});sparkle();
+  await sleep(1800,tk);setArm('R',null);
+}
+
+function showPart(p,tkIn){
+  document.querySelectorAll('.pick[data-part]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.part===p?'true':'false'));
+  const mol=$('mol');mol.classList.add('focus');mol.querySelectorAll('.part').forEach(g=>g.classList.toggle('hl',g.dataset.part===p));
+  point($('p-'+p));
+  const tk=tkIn||++token;expr('open','smile',MOL[p][1]);bounce();setArm('L',{present:true});
+  document.querySelector('.pick[data-part="'+p+'"]').classList.add('seen');
+  const pr=say(MOL[p][0],tk);pr.then(()=>{if(tk===token)setArm('L',null);}).catch(()=>{});return pr;
+}
+document.querySelectorAll('.pick[data-part]').forEach(b=>b.addEventListener('click',()=>showPart(b.dataset.part)));
+
+function showStop(i,tkIn){
+  document.querySelectorAll('.stop').forEach(x=>x.setAttribute('aria-pressed',x.dataset.step==i?'true':'false'));
+  point(document.querySelector('.stop[data-step="'+i+'"] .n'));
+  const r=ROUTE[i],tk=tkIn||++token;expr(r[1],r[2],r[3]);bounce();
+  document.querySelector('.stop[data-step="'+i+'"]').classList.add('seen');
+  const pr=say(r[0],tk,{talk:r[4],after:r[2]});pr.catch(()=>{});return pr;
+}
+document.querySelectorAll('.stop').forEach(b=>b.addEventListener('click',()=>showStop(+b.dataset.step)));
+
+function showCell(i,tkIn){
+  document.querySelectorAll('.pick[data-cell]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.cell==i?'true':'false'));
+  $('cellBox').innerHTML=CELL[i].html;
+  requestAnimationFrame(()=>point($('arr'+i)));
+  const tk=tkIn||++token;expr('open','smile',i?'curious':'focus');bounce();setArm('L',{count:true});
+  document.querySelector('.pick[data-cell="'+i+'"]').classList.add('seen');
+  const pr=say(CELL[i].say,tk,{after:i?'smirk':'smile',smile:true});pr.then(()=>{if(tk===token)setArm('L',null);}).catch(()=>{});return pr;
+}
+document.querySelectorAll('.pick[data-cell]').forEach(b=>b.addEventListener('click',()=>showCell(+b.dataset.cell)));
+$('again').addEventListener('click',()=>{const tk=++token;eatShow(tk).catch(()=>{});});
+
+/* ---------- navegação ---------- */
+const dotsEl=$('dots');
+slides.forEach((_,i)=>{const b=document.createElement('button');b.className='dot';b.setAttribute('aria-label','Ir para a tela '+(i+1));b.addEventListener('click',()=>go(i));dotsEl.appendChild(b);});
+/* ---------- transição: a molécula ganha vida, gira por trás do Ian e ele fica tonto ---------- */
+async function moleculeTransition(){
+  busy=true;const tk=++token;unpoint();setArm('R',null);setArm('L',null);
+  const mol=$('mol'),sr=stage.getBoundingClientRect(),mr=mol.getBoundingClientRect();
+  const U=mr.width/400; /* px por unidade do desenho */
+  /* monta o bicho em três partes: cabeça (cobalto + metil), corpo (anel) e cauda */
+  function seg(parts,ax,ay,extra){
+    const el=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    el.setAttribute('viewBox','0 0 400 320');el.classList.add('alive');
+    parts.forEach(n=>{const c=mol.querySelector('[data-part="'+n+'"]').cloneNode(true);c.removeAttribute('id');c.classList.remove('hl');c.style.opacity='1';el.appendChild(c);});
+    if(extra)el.insertAdjacentHTML('beforeend',extra);
+    Object.assign(el.style,{left:'0px',top:'0px',width:mr.width+'px',height:(mr.width*0.8)+'px',overflow:'visible',transformOrigin:(ax*U)+'px '+(ay*U)+'px',zIndex:4});
+    el.dataset.ax=ax;el.dataset.ay=ay;stage.appendChild(el);return el;
+  }
+  const head=seg(['metil','cobalto'],200,155);
+  const body=seg(['anel'],200,155),tail=seg(['cauda'],200,160);
+  const bonds=document.createElementNS('http://www.w3.org/2000/svg','svg');bonds.classList.add('alive');
+  Object.assign(bonds.style,{left:'0px',top:'0px',width:sr.width+'px',height:sr.height+'px',overflow:'visible',zIndex:4});
+  bonds.innerHTML='<line id="bd1" stroke="#0E0D0B" stroke-width="7" stroke-linecap="round"/><line id="bd1f" stroke="#A69C8A" stroke-width="3.2" stroke-linecap="round"/><line id="bd2" stroke="#0E0D0B" stroke-width="7" stroke-linecap="round"/><line id="bd2f" stroke="#A69C8A" stroke-width="3.2" stroke-linecap="round"/>';
+  stage.insertBefore(bonds,tail);
+  const bondSet=(n,a,b)=>['bd'+n,'bd'+n+'f'].forEach(id=>{const l=bonds.querySelector('#'+id);l.setAttribute('x1',a[0].toFixed(1));l.setAttribute('y1',a[1].toFixed(1));l.setAttribute('x2',b[0].toFixed(1));l.setAttribute('y2',b[1].toFixed(1));});
+  const segs=[tail,body,head,bonds];
+  const put=(el,x,y,rot,sc,sx=1)=>{el.style.transform='translate('+(x-el.dataset.ax*U).toFixed(1)+'px,'+(y-el.dataset.ay*U).toFixed(1)+'px) rotate('+rot.toFixed(1)+'deg) scale('+(sc*sx).toFixed(3)+','+sc.toFixed(3)+')';};
+  mol.style.visibility='hidden';
+  $('content').classList.add('out');
+  expr('wide','o','up');lookAt=head;bounce();
+  say('Ei! A molécula ganhou vida!',tk,{talk:'amazed',after:'o'}).catch(()=>{});
+  const x0=mr.left-sr.left+200*U,y0=mr.top-sr.top+155*U;
+  const easeIO=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+  const SC=0.56,D1=50*U,D2=54*U; /* distâncias curtas: as ligações mantêm as partes juntas */
+  let trail=null,hp=[x0,y0],hth=0,lastHead=[x0,y0],dirX=-1,spinPhi=0,lastPhi=0;
+  function along(dist){ /* ponto do rastro a uma distância atrás da cabeça */
+    let acc=0;for(let i=trail.length-1;i>0;i--){const a=trail[i],b=trail[i-1],d=Math.hypot(a.x-b.x,a.y-b.y);if(acc+d>=dist){const f=(dist-acc)/(d||1);return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,ang:Math.atan2(a.y-b.y,a.x-b.x),front:a.front};}acc+=d;}
+    const l=trail[0];return{x:l.x,y:l.y,ang:Math.PI,front:l.front};
+  }
+  await new Promise(res=>{
+    const T0=performance.now();
+    function f(now){
+      if(tk!==token){res();return;}
+      const t=now-T0,ir=wrap.getBoundingClientRect();
+      const icx=ir.left-sr.left+ir.width/2,icy=ir.top-sr.top+ir.height*0.42,rx=Math.min(ir.width*0.56,icx-30),ry=34;
+      let front=true,sc=SC;
+      if(t<800){
+        /* acorda: encolhe, a cabeça espia para os lados, a cauda balança */
+        const k=easeIO(t/800),s=1-(1-SC)*k;
+        put(tail,x0,y0+4*U,Math.sin(t/90)*10*k,s);
+        put(body,x0,y0,Math.sin(t/140)*4,s*(1+Math.sin(t/70)*0.03));
+        const hy=y0-Math.sin(t/800*Math.PI)*34;
+        put(head,x0,hy,Math.sin(t/120)*14,s,Math.sin(t/260)>0?1:-1);
+        bondSet(1,[x0,hy],[x0,y0]);bondSet(2,[x0,y0],[x0,y0+4*U]);
+        requestAnimationFrame(f);return;
+      }
+      if(!trail){trail=[];for(let i=60;i>=0;i--)trail.push({x:x0+i*3,y:y0+i*0.6,front:true});}
+      if(t<3400){
+        const k=(t-800)/2600,th=-k*Math.PI*4;hth=th;
+        const ox=icx+rx*Math.cos(th),oy=icy+ry*Math.sin(th),b=easeIO(Math.min(1,k/0.2));
+        hp=[x0+(ox-x0)*b,y0+(oy-y0)*b];front=Math.sin(th)>0||b<0.5;
+        spinPhi=(Math.PI/2-th)*Math.min(1,b*1.2);lastPhi=spinPhi;
+        if(k>0.55&&eyesNow!=='dizzy'){face('dizzy','wavy');brows('soft');}
+      }else if(t<4300){
+        /* sai voando para o alto, à direita; corpo e cauda vão atrás */
+        hp=[lastHead[0]+(sr.width+260-lastHead[0])*0.06,lastHead[1]+(-220-lastHead[1])*0.05];front=true;
+        const ke=easeIO(Math.min(1,(t-3400)/900));spinPhi=lastPhi+(Math.PI*4-lastPhi)*ke;
+      }else{res();return;}
+      trail.push({x:hp[0],y:hp[1],front});if(trail.length>400)trail.shift();
+      const vx=hp[0]-lastHead[0];if(Math.abs(vx)>0.4)dirX=vx<0?-1:1;lastHead=hp;
+      /* cabeça vira primeiro, corpo e cauda seguem o mesmo caminho atrás dela */
+      const H=along(0),B=along(D1),T=along(D1+D2);
+      const scl=p=>p.front?SC:SC*0.8;
+      const wag=Math.sin(t/110);
+      let hd=H.ang*57.3-(dirX<0?180:0);hd=((hd+540)%360)-180;
+      put(head,hp[0],hp[1],Math.max(-22,Math.min(22,hd*0.5)),scl(H),dirX);
+      put(body,B.x+Math.sin(t/130)*2,B.y+Math.cos(t/130)*2,B.ang*57.3+wag*6,scl(B));
+      put(tail,T.x,T.y,T.ang*57.3+180-40+wag*18,scl(T));
+      head.style.zIndex=H.front?4:2;body.style.zIndex=B.front?4:2;tail.style.zIndex=T.front?4:2;
+      bondSet(1,[hp[0],hp[1]],[B.x,B.y]);bondSet(2,[B.x,B.y],[T.x,T.y]);bonds.style.zIndex=B.front?4:2;
+      headSpin=spinPhi;
+      requestAnimationFrame(f);
+    }
+    requestAnimationFrame(f);
+  });
+  segs.forEach(e=>e.remove());mol.style.visibility='';headSpin=null;lookAt=null;
+  if(tk!==token){busy=false;$('content').classList.remove('out');dizzy=false;return false;}
+  dizzy=true;face('dizzy','wavy');brows('soft');
+  try{
+    await say('Uau… tá tudo girando…',tk,{after:'wavy'});
+    await sleep(400,tk);
+    dizzy=false;shake=true;expr('closed','closed','focus');
+    await sleep(550,tk);
+    shake=false;expr('open','smile','up');bounce();
+    await sleep(250,tk);
+  }catch(e){dizzy=false;shake=false;busy=false;$('content').classList.remove('out');return false;}
+  busy=false;return true;
+}
+
+function go(i){
+  if(busy)return;
+  i=Math.max(0,Math.min(slides.length-1,i));
+  if(cur===1&&i===2&&!reduce){moleculeTransition().then(ok=>{if(ok)show(2);});return;}
+  show(i);
+}
+function show(i){
+  lastActivity=performance.now();if(IDLE.on)stopIdle();
+  $('content').classList.remove('out');dizzy=false;shake=false;
+  slides[cur].classList.remove('on');cur=i;slides[cur].classList.add('on');
+  [...dotsEl.children].forEach((d,k)=>d.setAttribute('aria-current',k===cur?'true':'false'));
+  $('count').textContent=String(cur+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+  $('prev').disabled=cur===0;$('next').textContent=cur===slides.length-1?'Recomeçar':'Avançar';
+  const tk=++token;unpoint();setArm('R',null);setArm('L',null);capState={mode:'hidden',k:0};
+  document.querySelectorAll('#claims li').forEach(l=>l.classList.remove('lit'));
+  $('mol').classList.remove('focus');
+  place(SCENES[cur]);bounce();
+  SCENES[cur].run(tk).catch(()=>{});
+}
+$('prev').addEventListener('click',()=>go(cur-1));
+$('next').addEventListener('click',()=>go(cur===slides.length-1?0:cur+1));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(cur+1);if(e.key==='ArrowLeft')go(cur-1);});
+let sx=null;
+stage.addEventListener('pointerdown',e=>{sx=e.clientX});
+stage.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>70&&e.pointerType!=='mouse')go(cur+(dx<0?1:-1));});
+window.addEventListener('resize',()=>place(SCENES[cur]));
+
+go(0);
+requestAnimationFrame(render);
+})();
+</script>
+
+</body>
+</html>
