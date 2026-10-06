@@ -8,7 +8,7 @@
 <title>Ian explica a B12 | ADR Suplementos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
 <style>
 /* Layout: um palco escuro. O Ian é o protagonista: anda, cresce e diminui à esquerda do palco e estica o braço por cima do conteúdo para apontar o que está explicando. O conteúdo fica à direita. No celular, conteúdo em cima e Ian embaixo, com o balão ao lado. */
 :root{
@@ -145,6 +145,13 @@ button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
 #introBg.show{opacity:1;pointer-events:all}
 .ian-wrap.center{position:fixed;left:50%;top:50%;bottom:auto;z-index:51;transform:translate(-50%,-72%) scale(var(--cs,1.2));transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1);filter:drop-shadow(0 0 50px rgba(201,154,78,.3))}
 .ian-wrap.center.pre{opacity:0;transform:translate(-50%,-72%) scale(calc(var(--cs,1.2)*.82))}
+.endMark{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:#000;opacity:0;pointer-events:none;transition:opacity .5s ease}
+.endMark.on{opacity:1;pointer-events:all}
+.endMark.out{opacity:0}
+.endMark .mk{display:flex;flex-direction:column;align-items:center;gap:10px}
+.endMark span{font-family:"Space Grotesk",'DM Sans',sans-serif;font-weight:700;font-size:clamp(52px,12vw,128px);letter-spacing:.03em;border:1.5px solid #cfcfd3;padding:.1em .35em .16em;color:#F3EFE6;line-height:1.1;transform-origin:50% 50%}
+.endMark small{font-family:"Space Grotesk",'DM Sans',sans-serif;font-weight:500;font-size:clamp(13px,2vw,18px);letter-spacing:.08em;color:#a89f8d;opacity:0;transition:opacity .7s ease}
+.endMark.sub small{opacity:1}
 .glow{opacity:0;transition:opacity .35s}
 .glow.on{opacity:1}
 
@@ -845,6 +852,7 @@ async function eatShow(tk){
   await say('Metilcobalamina, sublingual, da <b>ADR Nutra</b>. Até a próxima!',tk,{after:'grin',smile:true});
   await sleep(500,tk);unpoint();setArm('R',{wave:true});sparkle();
   await sleep(1800,tk);setArm('R',null);
+  await sleep(500,tk);await outroToStart(tk);
 }
 
 function showPart(p,tkIn){
@@ -1002,6 +1010,50 @@ stage.addEventListener('pointerdown',e=>{sx=e.clientX});
 stage.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>70&&e.pointerType!=='mouse')go(cur+(dx<0?1:-1));});
 window.addEventListener('resize',()=>place(SCENES[cur]));
 
+/* ---------- fim: o Ian volta para dentro do pote e o crachá ADR cresce até virar a abertura do site ---------- */
+async function outroToStart(tk){
+  if(tk!==token)return;
+  busy=true;unpoint();lookAt=null;bubble.style.opacity='0';
+  const bg=$('introBg');
+  /* vai do palco para o centro da tela */
+  const A=svg.getBoundingClientRect();
+  wrap.style.setProperty('--cs',mobile()?0.85:Math.min(1.05,innerHeight/560));
+  wrap.style.transition='none';wrap.classList.add('center');void wrap.offsetWidth;
+  const B=svg.getBoundingClientRect();wrap.style.transition='';
+  svg.style.transformOrigin='0 0';
+  bg.classList.add('show');stage.classList.add('intro');
+  await svg.animate([{transform:'translate('+(A.left-B.left)+'px,'+(A.top-B.top)+'px) scale('+(A.width/B.width)+')'},{transform:'none'}],{duration:800,easing:'cubic-bezier(.3,1.1,.45,1)'}).finished.catch(()=>{});
+  /* acena, fecha os olhos e entra no pote: braços, pernas e cabeça */
+  face('happy','grin');brows('soft');
+  setArm('L',{pt:[112,262]});setArm('R',{pt:[188,262]});await wait(450);
+  face('closed','closed');
+  await tween(380,k=>{INTRO.legs=1-k;});
+  await tween(420,k=>{INTRO.head=1-k;},k=>k*k);pop=0.6;
+  await wait(450);
+  /* o crachá cresce até virar a marca ADR da abertura do site */
+  const br=$('badge').getBoundingClientRect();
+  const mk=document.createElement('div');mk.className='endMark';mk.innerHTML='<div class="mk"><span>ADR</span><small>Suplementos Nutra</small></div>';
+  document.body.appendChild(mk);
+  const sp=mk.querySelector('span'),sr2=sp.getBoundingClientRect();
+  const s0=br.width/sr2.width,dx=(br.left+br.width/2)-(sr2.left+sr2.width/2),dy=(br.top+br.height/2)-(sr2.top+sr2.height/2);
+  mk.classList.add('on');
+  wrap.style.transition='opacity .35s ease';wrap.style.opacity='0';
+  await sp.animate([{transform:'translate('+dx+'px,'+dy+'px) scale('+s0+')'},{transform:'none'}],{duration:1000,easing:'cubic-bezier(.6,0,.2,1)'}).finished.catch(()=>{});
+  mk.classList.add('sub');
+  await wait(1400);
+  if(window.parent!==window){
+    /* dentro do site: volta para o início da página */
+    try{window.parent.postMessage({ian:'fim'},'*');}catch(e){}
+    await wait(600);
+  }
+  /* sozinha: a marca some e a apresentação recomeça */
+  mk.classList.add('out');await wait(600);mk.remove();
+  wrap.style.transition='';wrap.style.opacity='';wrap.classList.remove('center');
+  bg.classList.remove('show');stage.classList.remove('intro');bubble.style.opacity='1';
+  busy=false;
+  token++;slides[cur].classList.remove('on');cur=0;slides[0].classList.add('on');
+  runIntro().then(()=>go(0));
+}
 /* ---------- abertura ---------- */
 function tween(ms,fn,ease){return new Promise(res=>{const t0=performance.now();(function f(now){const k=Math.min(1,(now-t0)/ms);fn(ease?ease(k):k);if(k<1)requestAnimationFrame(f);else res();})(t0);});}
 const backOut=k=>{const c=1.9;return 1+(c+1)*Math.pow(k-1,3)+c*Math.pow(k-1,2);};
