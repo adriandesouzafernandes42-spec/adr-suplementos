@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <style>[hidden]{display:none!important}</style>
+<script>if(/[?&]deitado\b/.test(location.search))document.documentElement.classList.add('deitado')</script>
+<style>/* aberto pelo site no celular deitado: layout do computador, com o palco ocupando a altura toda */
+html.deitado body{padding-block:10px;overflow:hidden}
+html.deitado header.top{margin-bottom:8px}
+html.deitado .stage{height:calc(100vh - 74px)}</style>
 <title>Ian explica a B12 | ADR Suplementos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
