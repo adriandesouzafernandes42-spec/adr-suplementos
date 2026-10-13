@@ -61,10 +61,13 @@ input,select,button{font:inherit}
 .wa{display:flex;align-items:center;justify-content:center;gap:6px;background:#25d366;color:#05230f;text-decoration:none;font-weight:600;font-size:13.5px;padding:9px 12px;border-radius:10px}
 .st{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #c99a4e66;background:#c99a4e14;color:var(--gold2);border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:600}
 .st:before{content:"";width:7px;height:7px;border-radius:99px;background:var(--gold)}
+.rm{background:transparent;border:1px solid #5a2a24;color:#e0968c;border-radius:10px;padding:8px 10px;font-size:13px;cursor:pointer}
+.rm:hover{background:#2a1512}
+.rm[disabled]{opacity:.5;cursor:wait}
 .empty{text-align:center;color:var(--mut);padding:40px 10px;border:1px dashed var(--line);border-radius:14px}
 .msg{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:#0e0d0b;font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:99px;box-shadow:0 10px 30px #000a;opacity:0;transition:opacity .25s;pointer-events:none}
 .msg.on{opacity:1}
-@media(max-width:520px){.acts .tx{display:none}.p{grid-template-columns:1fr}.p .r{flex-direction:row}.p .r>*{flex:1}.kpi b{font-size:22px}.top h1{font-size:16px}}
+@media(max-width:520px){.acts .tx{display:none}.p{grid-template-columns:1fr}.p .r{flex-direction:row;flex-wrap:wrap}.p .r>*{flex:1}.p .r .rm{flex-basis:100%}.kpi b{font-size:22px}.top h1{font-size:16px}}
 </style>
 </head>
 <body>
@@ -142,8 +145,15 @@ function render(){
  const b=$("busca").value.trim().toLowerCase(),bd=b.replace(/\D/g,"");
  const vis=pessoas.filter(p=>(!b||(p.nome+" "+p.cidade).toLowerCase().includes(b)||(bd&&p.whatsapp.replace(/\D/g,"").includes(bd))));
  $("lista").innerHTML=vis.length?vis.map(p=>{const dig=p.whatsapp.replace(/\D/g,""),txt=encodeURIComponent("Oi, "+p.nome.split(" ")[0]+"! Aqui é da ADR Nutra 💛");
- return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><span class="st">Aguardando</span></div></div>`}).join(""):`<div class="empty">${total?"Ninguém encontrado nessa busca.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
+ return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><span class="st">Aguardando</span><button type="button" class="rm" data-l="${p.linha}" data-w="${esc(dig)}" data-n="${esc(p.nome)}">🗑 Remover</button></div></div>`}).join(""):`<div class="empty">${total?"Ninguém encontrado nessa busca.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
 }
+$("lista").addEventListener("click",async e=>{const b=e.target.closest(".rm");if(!b)return;
+ if(!confirm("Remover "+b.dataset.n+" da Lista VIP?\n\nIsso apaga a inscrição da planilha e não dá pra desfazer."))return;
+ b.disabled=true;b.textContent="Removendo...";
+ try{const d=await api({acao:"remover",linha:b.dataset.l,whatsapp:b.dataset.w});
+  if(!d.ok){aviso(d.erro==="mudou"?"A lista mudou. Atualizei, tente de novo.":"Não foi possível remover.");await carregar(true);return}
+  aviso(b.dataset.n.split(" ")[0]+" removido(a)");await carregar(true)}
+ catch(_){b.disabled=false;b.textContent="🗑 Remover";aviso("Sem conexão. Tente de novo.")}});
 $("busca").addEventListener("input",render);
 $("bAtual").addEventListener("click",()=>carregar(false));
 function sair(){senha="";try{sessionStorage.removeItem("adrVipSenha")}catch(e){}pessoas=[];$("painel").classList.add("hidden");$("login").classList.remove("hidden");$("senha").value=""}
