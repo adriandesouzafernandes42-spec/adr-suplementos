@@ -435,10 +435,10 @@ addEventListener("resize",ajustar);addEventListener("orientationchange",()=>setT
 const hi=document.getElementById("ianHi");setTimeout(()=>hi.classList.add("quiet"),9000);hi.addEventListener("click",open);document.getElementById("ianClose").addEventListener("click",close);addEventListener("message",e=>{if(e.data&&e.data.ian==="fim"&&m.classList.contains("show")){window.scrollTo({top:0,behavior:"instant"});close()}});addEventListener("keydown",e=>{if(e.key==="Escape"&&m.classList.contains("show"))close()})}</script>
 <script>
 /* ===== LISTA VIP =====
-   Enquanto VIP_FORM estiver vazio, cada inscrição chega como mensagem no WhatsApp da ADR.
-   Para salvar direto numa planilha do Google, preencha VIP_FORM com o link do Google Forms
-   (terminando em /formResponse) e os códigos "entry." de cada pergunta. */
-const VIP_FORM={url:"",nome:"",whatsapp:"",cidade:"",potes:"",ok:""};
+   VIP_URL = link do App da Web da planilha "Lista VIP ADR" (Google Apps Script, termina em /exec).
+   Com ele preenchido, cada inscrição vai direto para a planilha e chega um e-mail para a ADR.
+   Enquanto estiver vazio, cada inscrição chega como mensagem no WhatsApp da ADR. */
+const VIP_URL="";
 {const f=document.getElementById("vipForm");if(f){
 const q=id=>document.getElementById(id),tel=q("vTel"),cid=q("vCid"),outraBox=q("vOutraBox");
 tel.addEventListener("input",()=>{let d=tel.value.replace(/\D/g,"").slice(0,11),o=d;if(d.length>2)o="("+d.slice(0,2)+") "+d.slice(2);if(d.length>7)o="("+d.slice(0,2)+") "+d.slice(2,d.length-4)+"-"+d.slice(-4);tel.value=o});
@@ -452,8 +452,7 @@ q("vChkL").classList.toggle("err",!ok);if(!ok)bad=true;
 if(bad){const first=f.querySelector(".err input,.err select");if(first)first.focus();return}
 const btn=q("vBtn");btn.disabled=true;btn.textContent="Enviando...";
 const fim=(viaWa)=>{f.innerHTML=`<div class="vipOk"><div class="ok">✓</div><h3>Você está na Lista VIP, ${nome.split(" ")[0]}!</h3><p>${viaWa?"Só falta tocar em <b>enviar</b> na conversa do WhatsApp que abriu.":"Vamos te avisar no WhatsApp assim que o B12 chegar."}</p><p>Enquanto isso, siga o <a href="https://www.instagram.com/adr_nutra/" target="_blank" rel="noopener" style="color:var(--gold)">@adr_nutra</a> pra ver os bastidores 💛</p></div>`};
-if(VIP_FORM.url){const b=new URLSearchParams();b.append(VIP_FORM.nome,nome);b.append(VIP_FORM.whatsapp,tel.value);b.append(VIP_FORM.cidade,cidade);b.append(VIP_FORM.potes,potes);if(VIP_FORM.ok)b.append(VIP_FORM.ok,"Sim");
-fetch(VIP_FORM.url,{method:"POST",mode:"no-cors",body:b}).then(()=>fim(false)).catch(()=>{btn.disabled=false;btn.textContent="Entrar na Lista VIP";alert("Não foi possível enviar agora. Confira sua internet e tente de novo.")})}
+if(VIP_URL){fetch(VIP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({nome,whatsapp:tel.value,cidade,potes,autorizou:"Sim"})}).then(()=>fim(false)).catch(()=>{btn.disabled=false;btn.textContent="Entrar na Lista VIP";alert("Não foi possível enviar agora. Confira sua internet e tente de novo.")})}
 else{const msg="Olá! Quero entrar na Lista VIP da ADR Nutra 💛\n\nNome: "+nome+"\nWhatsApp: "+tel.value+"\nCidade: "+cidade+"\nPotes: "+potes+"\n\nAutorizo o contato pelo WhatsApp sobre o lançamento.";
 window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(msg),"_blank","noopener");fim(true)}})}}
 </script>
