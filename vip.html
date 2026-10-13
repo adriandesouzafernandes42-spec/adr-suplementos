@@ -91,7 +91,7 @@ Suplementos alimentares não são medicamentos.
 <script>
 /* VIP_URL = link do App da Web da planilha "Lista VIP ADR" (termina em /exec).
    Vazio: cada inscrição chega como mensagem no WhatsApp da ADR. */
-const VIP_URL="";
+const VIP_URL="https://script.google.com/macros/s/AKfycby_ORkIqoiFejUzaBuVJwLzR9U1DCk5Sj9WYQ37iL3-yCsDmTQvxb4758GcintzL825Cg/exec";
 const WA="5548991671592";
 const q=id=>document.getElementById(id),f=q("vip"),tel=q("tel"),cid=q("cid");
 tel.addEventListener("input",()=>{let d=tel.value.replace(/\D/g,"").slice(0,11),o=d;if(d.length>2)o="("+d.slice(0,2)+") "+d.slice(2);if(d.length>7)o="("+d.slice(0,2)+") "+d.slice(2,d.length-4)+"-"+d.slice(-4);tel.value=o});
