@@ -49,7 +49,7 @@ input,select,button{font:inherit}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .chips span{background:#ffffff08;border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:12.5px;color:#dcd6c8}
 .chips span b{color:var(--gold)}
-.tools{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:14px}
+.tools{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:14px}
 .tools input,.tools select{background:var(--card);border:1px solid var(--line);color:var(--tx);padding:11px 12px;border-radius:10px;outline:none;width:100%;font-size:15px}
 .tools input:focus,.tools select:focus{border-color:var(--gold)}
 .list{display:grid;gap:10px}
@@ -59,10 +59,8 @@ input,select,button{font:inherit}
 .p .d b{color:#dcd6c8;font-weight:500}
 .p .r{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:132px}
 .wa{display:flex;align-items:center;justify-content:center;gap:6px;background:#25d366;color:#05230f;text-decoration:none;font-weight:600;font-size:13.5px;padding:9px 12px;border-radius:10px}
-.st{background:#0b0a08;border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:8px 10px;font-size:13.5px;outline:none;cursor:pointer}
-.st[data-v="Avisado"]{border-color:#c99a4e;color:var(--gold2)}
-.st[data-v="Comprou"]{border-color:#2f7a45;color:#8fd18f}
-.st[data-v="Desistiu"]{border-color:#5a2a24;color:#c98b82}
+.st{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid #c99a4e66;background:#c99a4e14;color:var(--gold2);border-radius:10px;padding:8px 10px;font-size:13.5px;font-weight:600}
+.st:before{content:"";width:7px;height:7px;border-radius:99px;background:var(--gold)}
 .empty{text-align:center;color:var(--mut);padding:40px 10px;border:1px dashed var(--line);border-radius:14px}
 .msg{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:#0e0d0b;font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:99px;box-shadow:0 10px 30px #000a;opacity:0;transition:opacity .25s;pointer-events:none}
 .msg.on{opacity:1}
@@ -91,13 +89,12 @@ input,select,button{font:inherit}
 <div class="kpis">
 <div class="kpi"><b id="kTotal">0</b><span>inscritos</span></div>
 <div class="kpi"><b id="kPotes">0</b><span>potes desejados</span></div>
-<div class="kpi"><b id="kComprou">0</b><span>já compraram</span></div>
+<div class="kpi"><b id="kCid">0</b><span>cidades</span></div>
 </div>
 <div class="meta"><div class="lb"><span>Meta da lista</span><span><b id="mTxt">0</b> de 50 pessoas</span></div><div class="bar"><i id="mBar" style="width:0"></i></div></div>
 <div class="chips" id="chips"></div>
 <div class="tools">
 <input id="busca" placeholder="Buscar por nome, cidade ou número">
-<select id="filtro"><option value="">Todos</option><option>Aguardando</option><option>Avisado</option><option>Comprou</option><option>Desistiu</option></select>
 </div>
 <div class="list" id="lista"></div>
 <p style="text-align:center;margin-top:18px"><button class="ghost" id="bCsv">⬇ Baixar lista (planilha)</button></p>
@@ -137,25 +134,22 @@ const qtd=p=>/3/.test(p)?3:(parseInt(p,10)||1);
 function render(){
  const total=pessoas.length;
  $("kTotal").textContent=total;
- $("kPotes").textContent=pessoas.filter(p=>p.status!=="Desistiu").reduce((a,p)=>a+qtd(p.potes),0)+(pessoas.some(p=>/3/.test(p.potes))?"+":"");
- $("kComprou").textContent=pessoas.filter(p=>p.status==="Comprou").length;
+ $("kPotes").textContent=pessoas.reduce((a,p)=>a+qtd(p.potes),0)+(pessoas.some(p=>/3/.test(p.potes))?"+":"");
+ 
  $("mTxt").textContent=total;$("mBar").style.width=Math.min(100,total/META*100)+"%";
- const cid={};pessoas.forEach(p=>cid[p.cidade]=(cid[p.cidade]||0)+1);
+ const cid={};pessoas.forEach(p=>cid[p.cidade]=(cid[p.cidade]||0)+1);$("kCid").textContent=Object.keys(cid).length;
  $("chips").innerHTML=Object.entries(cid).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span>${esc(c)} <b>${n}</b></span>`).join("");
- const b=$("busca").value.trim().toLowerCase(),bd=b.replace(/\D/g,""),f=$("filtro").value;
- const vis=pessoas.filter(p=>(!f||p.status===f)&&(!b||(p.nome+" "+p.cidade).toLowerCase().includes(b)||(bd&&p.whatsapp.replace(/\D/g,"").includes(bd))));
+ const b=$("busca").value.trim().toLowerCase(),bd=b.replace(/\D/g,"");
+ const vis=pessoas.filter(p=>(!b||(p.nome+" "+p.cidade).toLowerCase().includes(b)||(bd&&p.whatsapp.replace(/\D/g,"").includes(bd))));
  $("lista").innerHTML=vis.length?vis.map(p=>{const dig=p.whatsapp.replace(/\D/g,""),txt=encodeURIComponent("Oi, "+p.nome.split(" ")[0]+"! Aqui é da ADR Nutra 💛");
- return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><select class="st" data-l="${p.linha}" data-v="${esc(p.status)}">${["Aguardando","Avisado","Comprou","Desistiu"].map(s=>`<option${s===p.status?" selected":""}>${s}</option>`).join("")}</select></div></div>`}).join(""):`<div class="empty">${total?"Ninguém encontrado com esse filtro.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
+ return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><span class="st">Aguardando</span></div></div>`}).join(""):`<div class="empty">${total?"Ninguém encontrado nessa busca.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
 }
-$("lista").addEventListener("change",async e=>{const s=e.target.closest(".st");if(!s)return;const l=+s.dataset.l,v=s.value,p=pessoas.find(x=>x.linha===l),antes=p.status;
- p.status=v;s.dataset.v=v;render();
- try{const d=await api({acao:"status",linha:l,valor:v});if(!d.ok)throw 0;aviso(p.nome.split(" ")[0]+": "+v)}catch(_){p.status=antes;render();aviso("Não salvou. Tente de novo.")}});
-$("busca").addEventListener("input",render);$("filtro").addEventListener("change",render);
+$("busca").addEventListener("input",render);
 $("bAtual").addEventListener("click",()=>carregar(false));
 function sair(){senha="";try{sessionStorage.removeItem("adrVipSenha")}catch(e){}pessoas=[];$("painel").classList.add("hidden");$("login").classList.remove("hidden");$("senha").value=""}
 $("bSair").addEventListener("click",sair);
 $("fLogin").addEventListener("submit",e=>{e.preventDefault();senha=$("senha").value;if(!senha){$("erLogin").textContent="Digite a senha.";return}$("erLogin").textContent="";$("bLogin").disabled=true;$("bLogin").textContent="Entrando...";carregar(true)});
-$("bCsv").addEventListener("click",()=>{const linhas=[["Data","Nome","WhatsApp","Cidade","Potes","Status"],...pessoas.map(p=>[p.data,p.nome,p.whatsapp,p.cidade,p.potes,p.status])];
+$("bCsv").addEventListener("click",()=>{const linhas=[["Data","Nome","WhatsApp","Cidade","Potes","Status"],...pessoas.map(p=>[p.data,p.nome,p.whatsapp,p.cidade,p.potes,"Aguardando"])];
  const csv="﻿"+linhas.map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\r\n");
  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="lista-vip-adr.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
 if(senha)carregar(true);
