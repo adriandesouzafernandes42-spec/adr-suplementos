@@ -296,11 +296,11 @@ button:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
 
       <section class="slide">
         <span class="eyebrow">ADR Nutra</span>
-        <h2>Vitamina B12 Metilcobalamina Sublingual</h2>
+        <h2>Vitamina B12 Metilcobalamina Mastigável</h2>
         <div class="facts" id="prodFacts">
           <span class="chip">forma <em>metilcobalamina</em></span>
-          <span class="chip"><em>414%</em> do VD por porção</span>
-          <span class="chip">uso <em>sublingual</em></span>
+          <span class="chip"><em>828%</em> do VD por porção</span>
+          <span class="chip">cápsula <em>mastigável</em></span>
         </div>
         <p>Use conforme a recomendação de consumo indicada no rótulo.</p>
         <div><button class="pick" id="again">Ver o Ian de novo</button></div>
@@ -763,7 +763,7 @@ const MOL={
   cauda:['A <b>cauda</b> tem uma base, um açúcar e um fosfato. Ela dobra por baixo e ajuda a deixar a molécula estável.','focus']
 };
 const ROUTE=[
-  ['Tudo começa na <b>boca</b>. No formato sublingual, o produto fica embaixo da língua até dissolver, como diz o rótulo.','open','smile','soft','neutral'],
+  ['Tudo começa na <b>boca</b>. No formato mastigável, a cápsula é mastigada e segue para o estômago.','open','smile','soft','neutral'],
   ['No <b>estômago</b>, o ácido solta a B12 dos alimentos. Ela se prende à haptocorrina, uma proteína protetora que vem da saliva.','wide','o','up','amazed'],
   ['No <b>intestino</b>, ela troca de par e se une ao fator intrínseco. Juntos, são absorvidos no final do intestino delgado.','open','smirk','curious','neutral'],
   ['No <b>sangue</b>, quem leva a B12 é a transcobalamina. Ela entrega a vitamina para as células do corpo.','open','smile','focus','neutral'],
@@ -854,7 +854,7 @@ async function eatShow(tk){
   expr('happy','grin','up');sparkle();bounce();
   await say('Hmm! Prontinho, minha <b>B12</b> do dia.',tk,{talk:'happy',after:'grin'});
   await sleep(500,tk);expr('wink','smirk','curious');point($('prodFacts'));
-  await say('Metilcobalamina, sublingual, da <b>ADR Nutra</b>. Até a próxima!',tk,{after:'grin',smile:true});
+  await say('Metilcobalamina, mastigável, da <b>ADR Nutra</b>. Até a próxima!',tk,{after:'grin',smile:true});
   await sleep(500,tk);unpoint();setArm('R',{wave:true});sparkle();
   await sleep(1800,tk);setArm('R',null);
   await sleep(500,tk);await outroToStart(tk);
