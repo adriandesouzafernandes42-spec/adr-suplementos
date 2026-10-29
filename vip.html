@@ -54,10 +54,16 @@ button[disabled]{opacity:.6;cursor:wait;transform:none}
 .ok .c{width:62px;height:62px;border-radius:99px;margin:0 auto 14px;display:grid;place-items:center;background:#c99a4e22;border:1px solid #c99a4e77;color:var(--gold);font-size:28px}
 .ok h2{margin-bottom:8px}.ok p{color:var(--mut);font-size:14.5px;margin:0 0 6px}
 .ok a{color:var(--gold)}
+.prod{margin:34px 0 0;text-align:center;position:relative}
+.prod:before{content:"";position:absolute;left:50%;top:42%;width:260px;height:260px;transform:translate(-50%,-50%);border-radius:99px;background:radial-gradient(circle,#c4232f40,#c99a4e1a 45%,transparent 70%);filter:blur(6px);pointer-events:none}
+.prod img{position:relative;width:170px;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 24px 30px #000d);animation:flt 5s ease-in-out infinite}
+.prod figcaption{position:relative;margin-top:16px;font:600 15px "Space Grotesk",sans-serif;letter-spacing:.02em}
+.prod figcaption small{display:block;margin-top:4px;font:400 13px Inter,system-ui,sans-serif;color:var(--mut)}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 footer{text-align:center;color:#6f695e;font-size:12px;margin-top:30px;line-height:1.7}
 footer a{color:var(--mut);text-decoration:none}
 @media(max-width:380px){.row{grid-template-columns:1fr}}
-@media(prefers-reduced-motion:reduce){.tag:before{animation:none}}
+@media(prefers-reduced-motion:reduce){.tag:before,.prod img{animation:none}}
 </style>
 </head>
 <body>
@@ -82,6 +88,10 @@ footer a{color:var(--mut);text-decoration:none}
 <button type="submit" id="btn">Entrar na Lista VIP</button>
 <p class="small">Leva 20 segundos. Seus dados são usados só para avisar sobre a ADR.</p>
 </form>
+<figure class="prod">
+<img src="b12-vip.webp" width="351" height="677" alt="Pote do B12 Sublingual ADR, sabor morango, 30 cápsulas" loading="lazy">
+<figcaption>B12 Sublingual ADR<small>Sabor morango · Cápsula de tapioca · 30 cápsulas</small></figcaption>
+</figure>
 <footer>
 <a href="https://www.instagram.com/adr_nutra/" target="_blank" rel="noopener">@adr_nutra</a> · <a href="mailto:adrnutra@gmail.com">adrnutra@gmail.com</a><br>
 ADR Suplementos · CNPJ 69.292.152/0001-01 · Içara/SC<br>
