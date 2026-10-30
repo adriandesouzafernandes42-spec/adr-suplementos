@@ -54,6 +54,11 @@ button[disabled]{opacity:.6;cursor:wait;transform:none}
 .ok .c{width:62px;height:62px;border-radius:99px;margin:0 auto 14px;display:grid;place-items:center;background:#c99a4e22;border:1px solid #c99a4e77;color:var(--gold);font-size:28px}
 .ok h2{margin-bottom:8px}.ok p{color:var(--mut);font-size:14.5px;margin:0 0 6px}
 .ok a{color:var(--gold)}
+.price{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 auto 24px;padding:14px 18px;max-width:340px;border:1px solid #c99a4e55;border-radius:14px;background:#c99a4e10}
+.price s{color:var(--mut);font-size:15px}
+.price b{font:700 34px/1 "Space Grotesk",sans-serif;color:var(--gold2)}
+.price small{display:block;font-size:12px;color:var(--mut);margin-top:4px}
+.prod figcaption .pr{display:block;margin-top:6px;font:700 20px "Space Grotesk",sans-serif;color:var(--gold2)}
 .prod{margin:34px 0 0;text-align:center;position:relative}
 .prod:before{content:"";position:absolute;left:50%;top:42%;width:260px;height:260px;transform:translate(-50%,-50%);border-radius:99px;background:radial-gradient(circle,#c4232f40,#c99a4e1a 45%,transparent 70%);filter:blur(6px);pointer-events:none}
 .prod img{position:relative;width:170px;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 24px 30px #000d);animation:flt 5s ease-in-out infinite}
@@ -72,6 +77,7 @@ footer a{color:var(--mut);text-decoration:none}
 <div class="tag">Primeiro lote</div>
 <h1>Entre na <span>Lista VIP</span> do B12 Mastigável</h1>
 <p class="lead">O primeiro lote da ADR Nutra é pequeno: só 300 potes. Quem está na lista compra antes de todo mundo.</p>
+<div class="price"><s>R$ 69,90</s><div><b>R$ 59,90</b><small>pote com 30 cápsulas</small></div></div>
 <ul class="perks">
 <li><i>1</i><span><b>Compra antes:</b> você recebe o aviso no WhatsApp assim que o lote chegar.</span></li>
 <li><i>2</i><span><b>Condição especial de lançamento</b> só para quem está na lista.</span></li>
@@ -90,7 +96,7 @@ footer a{color:var(--mut);text-decoration:none}
 </form>
 <figure class="prod">
 <img src="b12-vip.webp?v=3" width="702" height="1354" alt="Pote do B12 Mastigável ADR, sabor morango, 30 cápsulas" loading="lazy">
-<figcaption>B12 Mastigável ADR<small>Sabor morango · Cápsula de tapioca · 30 cápsulas</small></figcaption>
+<figcaption>B12 Mastigável ADR<small>Sabor morango · Cápsula de tapioca · 30 cápsulas</small><span class="pr">R$ 59,90</span></figcaption>
 </figure>
 <footer>
 <a href="https://www.instagram.com/adr_nutra/" target="_blank" rel="noopener">@adr_nutra</a> · <a href="mailto:adrnutra@gmail.com">adrnutra@gmail.com</a><br>
