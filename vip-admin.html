@@ -64,10 +64,23 @@ input,select,button{font:inherit}
 .rm{background:transparent;border:1px solid #5a2a24;color:#e0968c;border-radius:10px;padding:8px 10px;font-size:13px;cursor:pointer}
 .rm:hover{background:#2a1512}
 .rm[disabled]{opacity:.5;cursor:wait}
+.chipsT{font-size:12px;color:var(--mut);margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em}
+.chips button{background:#ffffff08;border:1px solid var(--line);border-radius:99px;padding:5px 11px;font-size:12.5px;color:#dcd6c8;cursor:pointer}
+.chips button b{color:var(--gold)}.chips button.on{border-color:var(--gold);background:#c99a4e22}
+.p .ind{margin-top:4px;font-size:13px;color:var(--mut)}.p .ind b{color:var(--gold2);font-weight:600}
+.bar2{display:flex;gap:8px;margin-bottom:14px}.bar2 .ghost{flex:1;padding:11px 12px;font-size:14px}
+.box{background:var(--card);border:1px solid #c99a4e55;border-radius:14px;padding:16px;margin-bottom:14px}
+.box h2{font-size:16px;margin-bottom:12px}.box p{color:var(--mut);font-size:13px;margin:0 0 12px}
+.box .g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box label{display:grid;gap:5px;font-size:13px;font-weight:600;color:#dcd6c8}
+.box input,.box select{background:#0b0a08;border:1px solid var(--line);color:var(--tx);padding:11px 12px;border-radius:10px;outline:none;width:100%;font-size:15px}
+.box input:focus,.box select:focus{border-color:var(--gold)}
+.box .full{grid-column:1/-1}.box .btn{width:100%;margin-top:12px}
+.lnk{display:flex;gap:8px;margin-top:10px}.lnk input{flex:1;font-size:13px}.lnk .ghost{white-space:nowrap}
 .empty{text-align:center;color:var(--mut);padding:40px 10px;border:1px dashed var(--line);border-radius:14px}
 .msg{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:#0e0d0b;font-weight:600;font-size:13.5px;padding:10px 16px;border-radius:99px;box-shadow:0 10px 30px #000a;opacity:0;transition:opacity .25s;pointer-events:none}
 .msg.on{opacity:1}
-@media(max-width:520px){.acts .tx{display:none}.p{grid-template-columns:1fr}.p .r{flex-direction:row;flex-wrap:wrap}.p .r>*{flex:1}.p .r .rm{flex-basis:100%}.kpi b{font-size:22px}.top h1{font-size:16px}}
+@media(max-width:520px){.acts .tx{display:none}.p{grid-template-columns:1fr}.p .r{flex-direction:row;flex-wrap:wrap}.p .r>*{flex:1}.p .r .rm{flex-basis:100%}.box .g{grid-template-columns:1fr}.kpi b{font-size:22px}.top h1{font-size:16px}}
 </style>
 </head>
 <body>
@@ -95,9 +108,33 @@ input,select,button{font:inherit}
 <div class="kpi"><b id="kCid">0</b><span>cidades</span></div>
 </div>
 <div class="meta"><div class="lb"><span>Meta da lista</span><span><b id="mTxt">0</b> de 50 pessoas</span></div><div class="bar"><i id="mBar" style="width:0"></i></div></div>
+<div class="bar2"><button class="ghost" id="bAdd" type="button">＋ Adicionar pessoa</button><button class="ghost" id="bLink" type="button">🔗 Link de indicação</button></div>
+<form class="box hidden" id="fAdd" novalidate>
+<h2>Adicionar na Lista VIP</h2>
+<p>Para quem pediu pra entrar por mensagem ou pessoalmente. Fica marcado quem colocou.</p>
+<div class="g">
+<label class="full">Nome<input id="aNome" maxlength="80" autocomplete="off"></label>
+<label>WhatsApp com DDD<input id="aTel" type="tel" inputmode="numeric" maxlength="16" placeholder="(48) 99999-9999"></label>
+<label>Cidade<input id="aCid" maxlength="60" list="cidades" placeholder="Içara"></label>
+<label>Potes<select id="aPotes"><option>1</option><option>2</option><option>3 ou mais</option></select></label>
+<label>Indicado por<input id="aInd" maxlength="40" list="indicadores"></label>
+</div>
+<datalist id="cidades"><option>Içara</option><option>Criciúma</option><option>Cocal do Sul</option></datalist>
+<datalist id="indicadores"></datalist>
+<button class="btn" type="submit" id="aBtn">Adicionar</button>
+</form>
+<div class="box hidden" id="boxLink">
+<h2>Link de indicação</h2>
+<p>Quem entrar na lista por este link fica marcado como indicação dessa pessoa. Bom para você e para os vendedores.</p>
+<label>Nome de quem vai divulgar<input id="lNome" maxlength="40" list="indicadores"></label>
+<div class="lnk"><input id="lUrl" readonly><button class="ghost" type="button" id="lCopiar">Copiar</button></div>
+</div>
+<p class="chipsT">Por cidade</p>
 <div class="chips" id="chips"></div>
+<p class="chipsT">Quem indicou <span style="text-transform:none;letter-spacing:0">· toque para filtrar</span></p>
+<div class="chips" id="chipsInd"></div>
 <div class="tools">
-<input id="busca" placeholder="Buscar por nome, cidade ou número">
+<input id="busca" placeholder="Buscar por nome, cidade, número ou quem indicou">
 </div>
 <div class="list" id="lista"></div>
 <p style="text-align:center;margin-top:18px"><button class="ghost" id="bCsv">⬇ Baixar lista (planilha)</button></p>
@@ -110,7 +147,10 @@ input,select,button{font:inherit}
 const VIP_URL="https://script.google.com/macros/s/AKfycby_ORkIqoiFejUzaBuVJwLzR9U1DCk5Sj9WYQ37iL3-yCsDmTQvxb4758GcintzL825Cg/exec";
 const META=50;
 const $=id=>document.getElementById(id);
-let senha="",pessoas=[];
+let senha="",pessoas=[],filtroInd="";
+const SOZINHO="Entrou sozinho";
+const indDe=p=>String(p.indicou||"").trim()||SOZINHO;
+let eu="Adrian";try{eu=localStorage.getItem("adrVipEu")||"Adrian"}catch(e){}
 try{senha=sessionStorage.getItem("adrVipSenha")||""}catch(e){}
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const aviso=t=>{const m=$("msg");m.textContent=t;m.classList.add("on");clearTimeout(aviso.t);aviso.t=setTimeout(()=>m.classList.remove("on"),2200)};
@@ -142,10 +182,14 @@ function render(){
  $("mTxt").textContent=total;$("mBar").style.width=Math.min(100,total/META*100)+"%";
  const cid={};pessoas.forEach(p=>cid[p.cidade]=(cid[p.cidade]||0)+1);$("kCid").textContent=Object.keys(cid).length;
  $("chips").innerHTML=Object.entries(cid).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<span>${esc(c)} <b>${n}</b></span>`).join("");
+ const ind={};pessoas.forEach(p=>{const k=indDe(p);ind[k]=(ind[k]||0)+1});
+ if(filtroInd&&!ind[filtroInd])filtroInd="";
+ $("chipsInd").innerHTML=Object.entries(ind).sort((a,b)=>(a[0]===SOZINHO)-(b[0]===SOZINHO)||b[1]-a[1]).map(([c,n])=>`<button type="button" data-i="${esc(c)}" class="${c===filtroInd?"on":""}">${esc(c)} <b>${n}</b></button>`).join("");
+ $("indicadores").innerHTML=[...new Set([eu,...Object.keys(ind).filter(k=>k!==SOZINHO)])].map(k=>`<option value="${esc(k)}">`).join("");
  const b=$("busca").value.trim().toLowerCase(),bd=b.replace(/\D/g,"");
- const vis=pessoas.filter(p=>(!b||(p.nome+" "+p.cidade).toLowerCase().includes(b)||(bd&&p.whatsapp.replace(/\D/g,"").includes(bd))));
+ const vis=pessoas.filter(p=>(!filtroInd||indDe(p)===filtroInd)&&(!b||(p.nome+" "+p.cidade+" "+(p.indicou||"")).toLowerCase().includes(b)||(bd&&p.whatsapp.replace(/\D/g,"").includes(bd))));
  $("lista").innerHTML=vis.length?vis.map(p=>{const dig=p.whatsapp.replace(/\D/g,""),txt=encodeURIComponent("Oi, "+p.nome.split(" ")[0]+"! Aqui é da ADR Nutra 💛");
- return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><span class="st">Aguardando</span><button type="button" class="rm" data-l="${p.linha}" data-w="${esc(dig)}" data-n="${esc(p.nome)}">🗑 Remover</button></div></div>`}).join(""):`<div class="empty">${total?"Ninguém encontrado nessa busca.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
+ return `<div class="p"><div><h3>${esc(p.nome)}</h3><div class="d"><b>${esc(p.whatsapp)}</b> · ${esc(p.cidade)} · ${esc(p.potes)} pote${qtd(p.potes)>1?"s":""}</div><div class="d">Inscrito em ${esc(p.data)}</div><div class="ind">${p.indicou?`👤 Indicado por <b>${esc(p.indicou)}</b>`:"Entrou sozinho pelo link"}</div></div><div class="r"><a class="wa" href="https://wa.me/55${dig}?text=${txt}" target="_blank" rel="noopener">💬 WhatsApp</a><span class="st">Aguardando</span><button type="button" class="rm" data-l="${p.linha}" data-w="${esc(dig)}" data-n="${esc(p.nome)}">🗑 Remover</button></div></div>`}).join(""):`<div class="empty">${total&&(b||filtroInd)?"Ninguém encontrado nessa busca.":"Ainda ninguém na lista. Divulgue o link adr-suplementos.pages.dev/vip 💛"}</div>`;
 }
 $("lista").addEventListener("click",async e=>{const b=e.target.closest(".rm");if(!b)return;
  if(!confirm("Remover "+b.dataset.n+" da Lista VIP?\n\nIsso apaga a inscrição da planilha e não dá pra desfazer."))return;
@@ -155,11 +199,34 @@ $("lista").addEventListener("click",async e=>{const b=e.target.closest(".rm");if
   aviso(b.dataset.n.split(" ")[0]+" removido(a)");await carregar(true)}
  catch(_){b.disabled=false;b.textContent="🗑 Remover";aviso("Sem conexão. Tente de novo.")}});
 $("busca").addEventListener("input",render);
+$("chipsInd").addEventListener("click",e=>{const c=e.target.closest("button");if(!c)return;filtroInd=filtroInd===c.dataset.i?"":c.dataset.i;render()});
+const abrir=id=>{["fAdd","boxLink"].forEach(x=>{if(x!==id)$(x).classList.add("hidden")});$(id).classList.toggle("hidden")};
+$("bAdd").addEventListener("click",()=>{abrir("fAdd");if(!$("aInd").value)$("aInd").value=eu;$("aNome").focus()});
+$("bLink").addEventListener("click",()=>{abrir("boxLink");if(!$("lNome").value)$("lNome").value=eu;gerarLink()});
+const fone=el=>el.addEventListener("input",()=>{let d=el.value.replace(/\D/g,"").slice(0,11),o=d;if(d.length>2)o="("+d.slice(0,2)+") "+d.slice(2);if(d.length>7)o="("+d.slice(0,2)+") "+d.slice(2,d.length-4)+"-"+d.slice(-4);el.value=o});fone($("aTel"));
+function gerarLink(){const n=$("lNome").value.trim();$("lUrl").value="https://adr-suplementos.pages.dev/vip.html"+(n?"?ref="+encodeURIComponent(n):"")}
+$("lNome").addEventListener("input",gerarLink);
+$("lCopiar").addEventListener("click",async()=>{try{await navigator.clipboard.writeText($("lUrl").value)}catch(_){$("lUrl").select();document.execCommand("copy")}aviso("Link copiado")});
+$("fAdd").addEventListener("submit",async e=>{e.preventDefault();
+ const nome=$("aNome").value.trim(),whats=$("aTel").value,dig=whats.replace(/\D/g,""),cidade=$("aCid").value.trim(),potes=$("aPotes").value,indicou=$("aInd").value.trim();
+ if(nome.length<2)return aviso("Digite o nome"),$("aNome").focus();
+ if(dig.length<10||dig.length>11)return aviso("WhatsApp inválido"),$("aTel").focus();
+ if(!cidade)return aviso("Digite a cidade"),$("aCid").focus();
+ if(!indicou)return aviso("Diga quem indicou"),$("aInd").focus();
+ if(pessoas.some(p=>p.whatsapp.replace(/\D/g,"")===dig))return aviso("Esse WhatsApp já está na lista");
+ const bt=$("aBtn");bt.disabled=true;bt.textContent="Adicionando...";
+ try{const d=await api({acao:"adicionar",nome,whatsapp:whats,cidade,potes,indicou});
+  if(!d.ok){aviso(d.erro==="acao"?"A planilha ainda não foi atualizada para isso.":d.erro==="repetido"?"Esse WhatsApp já está na lista":"Não foi possível adicionar.");return}
+  eu=indicou;try{localStorage.setItem("adrVipEu",eu)}catch(_){}
+  ["aNome","aTel","aCid"].forEach(x=>$(x).value="");$("fAdd").classList.add("hidden");
+  aviso(nome.split(" ")[0]+" adicionado(a)");await carregar(true)}
+ catch(_){aviso("Sem conexão. Tente de novo.")}
+ finally{bt.disabled=false;bt.textContent="Adicionar"}});
 $("bAtual").addEventListener("click",()=>carregar(false));
 function sair(){senha="";try{sessionStorage.removeItem("adrVipSenha")}catch(e){}pessoas=[];$("painel").classList.add("hidden");$("login").classList.remove("hidden");$("senha").value=""}
 $("bSair").addEventListener("click",sair);
 $("fLogin").addEventListener("submit",e=>{e.preventDefault();senha=$("senha").value;if(!senha){$("erLogin").textContent="Digite a senha.";return}$("erLogin").textContent="";$("bLogin").disabled=true;$("bLogin").textContent="Entrando...";carregar(true)});
-$("bCsv").addEventListener("click",()=>{const linhas=[["Data","Nome","WhatsApp","Cidade","Potes","Status"],...pessoas.map(p=>[p.data,p.nome,p.whatsapp,p.cidade,p.potes,"Aguardando"])];
+$("bCsv").addEventListener("click",()=>{const linhas=[["Data","Nome","WhatsApp","Cidade","Potes","Indicado por","Status"],...pessoas.map(p=>[p.data,p.nome,p.whatsapp,p.cidade,p.potes,p.indicou||"",""+"Aguardando"])];
  const csv="﻿"+linhas.map(l=>l.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\r\n");
  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="lista-vip-adr.csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)});
 if(senha)carregar(true);

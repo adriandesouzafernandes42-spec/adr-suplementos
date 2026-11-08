@@ -43,6 +43,8 @@ form h2{font:700 20px "Space Grotesk",sans-serif;margin:0 0 16px}
 .f .em{display:none;color:#ff8a7a;font-size:12.5px}.f.err .em{display:block}
 .row{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
 .hidden{display:none!important}
+.ind{margin:-2px 0 16px;font-size:13px;color:var(--mut);text-align:center}.ind b{color:var(--gold2)}
+.f label small{font-weight:400;color:var(--mut)}
 .chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--mut);margin:4px 0 18px;cursor:pointer;line-height:1.45}
 .chk input{flex:none;width:18px;height:18px;margin:1px 0 0;accent-color:var(--gold)}
 .chk.err{color:#ff8a7a}
@@ -90,6 +92,8 @@ footer a{color:var(--mut);text-decoration:none}
 <div class="row"><div class="f"><label for="cid">Cidade</label><select id="cid"><option value="">Selecione</option><option>Içara</option><option>Criciúma</option><option>Cocal do Sul</option><option>Outra</option></select><span class="em">Escolha a cidade.</span></div>
 <div class="f"><label for="qtd">Quantos potes?</label><select id="qtd"><option>1</option><option>2</option><option>3 ou mais</option></select></div></div>
 <div class="f hidden" id="outraBox"><label for="outra">Qual cidade?</label><input id="outra" placeholder="Nome da cidade" maxlength="60"><span class="em">Digite a cidade.</span></div>
+<div class="f" id="indBox"><label for="indicou">Quem te indicou? <small>(opcional)</small></label><input id="indicou" placeholder="Nome de quem te passou o link" maxlength="40"></div>
+<p class="ind hidden" id="indTxt"></p>
 <label class="chk" id="chkL"><input type="checkbox" id="ok"> <span>Autorizo a ADR Nutra a entrar em contato pelo WhatsApp sobre o lançamento.</span></label>
 <button type="submit" id="btn">Entrar na Lista VIP</button>
 <p class="small">Leva 20 segundos. Seus dados são usados só para avisar sobre a ADR.</p>
@@ -112,17 +116,20 @@ const WA="5548991671592";
 const q=id=>document.getElementById(id),f=q("vip"),tel=q("tel"),cid=q("cid");
 tel.addEventListener("input",()=>{let d=tel.value.replace(/\D/g,"").slice(0,11),o=d;if(d.length>2)o="("+d.slice(0,2)+") "+d.slice(2);if(d.length>7)o="("+d.slice(0,2)+") "+d.slice(2,d.length-4)+"-"+d.slice(-4);tel.value=o});
 cid.addEventListener("change",()=>q("outraBox").classList.toggle("hidden",cid.value!=="Outra"));
+/* Link de indicação: vip.html?ref=Nome marca quem indicou */
+const REF=(()=>{try{return(new URLSearchParams(location.search).get("ref")||"").replace(/[<>&"]/g,"").trim().slice(0,40)}catch(_){return""}})();
+if(REF){q("indicou").value=REF;q("indBox").classList.add("hidden");q("indTxt").innerHTML="Indicação de <b></b> 💛";q("indTxt").querySelector("b").textContent=REF;q("indTxt").classList.remove("hidden")}
 const mark=(el,bad)=>{el.closest(".f").classList.toggle("err",bad);return bad};
 f.addEventListener("submit",e=>{e.preventDefault();
- const nome=q("nome").value.trim(),d=tel.value.replace(/\D/g,""),cidade=cid.value==="Outra"?q("outra").value.trim():cid.value,potes=q("qtd").value,ok=q("ok").checked;
+ const nome=q("nome").value.trim(),d=tel.value.replace(/\D/g,""),cidade=cid.value==="Outra"?q("outra").value.trim():cid.value,potes=q("qtd").value,ok=q("ok").checked,indicou=q("indicou").value.trim();
  let bad=false;bad=mark(q("nome"),nome.length<2)||bad;bad=mark(tel,d.length<10||d.length>11)||bad;bad=mark(cid,!cid.value)||bad;
  if(cid.value==="Outra")bad=mark(q("outra"),!cidade)||bad;
  q("chkL").classList.toggle("err",!ok);if(!ok)bad=true;
  if(bad){const x=f.querySelector(".err input,.err select");if(x)x.focus();return}
  const btn=q("btn");btn.disabled=true;btn.textContent="Enviando...";
  const fim=viaWa=>{f.innerHTML=`<div class="ok"><div class="c">✓</div><h2>Você está na Lista VIP, ${nome.split(" ")[0].replace(/[<>&"]/g,"")}!</h2><p>${viaWa?"Só falta tocar em <b>enviar</b> na conversa do WhatsApp que abriu.":"Vamos te avisar no WhatsApp assim que o B12 chegar."}</p><p>Enquanto isso, siga o <a href="https://www.instagram.com/adr_nutra/" target="_blank" rel="noopener">@adr_nutra</a> pra ver os bastidores 💛</p></div>`};
- if(VIP_URL){fetch(VIP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({nome,whatsapp:tel.value,cidade,potes,autorizou:"Sim"})}).then(()=>fim(false)).catch(()=>{btn.disabled=false;btn.textContent="Entrar na Lista VIP";alert("Não foi possível enviar agora. Confira sua internet e tente de novo.")})}
- else{const msg="Olá! Quero entrar na Lista VIP da ADR Nutra 💛\n\nNome: "+nome+"\nWhatsApp: "+tel.value+"\nCidade: "+cidade+"\nPotes: "+potes+"\n\nAutorizo o contato pelo WhatsApp sobre o lançamento.";
+ if(VIP_URL){fetch(VIP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({nome,whatsapp:tel.value,cidade,potes,autorizou:"Sim",indicou})}).then(()=>fim(false)).catch(()=>{btn.disabled=false;btn.textContent="Entrar na Lista VIP";alert("Não foi possível enviar agora. Confira sua internet e tente de novo.")})}
+ else{const msg="Olá! Quero entrar na Lista VIP da ADR Nutra 💛\n\nNome: "+nome+"\nWhatsApp: "+tel.value+"\nCidade: "+cidade+"\nPotes: "+potes+(indicou?"\nIndicado por: "+indicou:"")+"\n\nAutorizo o contato pelo WhatsApp sobre o lançamento.";
   window.open("https://wa.me/"+WA+"?text="+encodeURIComponent(msg),"_blank","noopener");fim(true)}});
 </script>
 </body>
